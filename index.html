@@ -170,6 +170,88 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px}
 .btn-ghost{background:transparent;border:1px solid var(--line2);color:var(--muted2);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;transition:all .18s}
 .btn-ghost:hover{border-color:var(--line3);color:var(--text)}
 
+/* ═══ TEAM BUILDER - SPLIT LAYOUT ═══ */
+.team-builder{display:grid;grid-template-columns:1fr 1fr;gap:0;height:calc(100vh - 120px);min-height:600px}
+.tb-left{padding:16px;border-right:1px solid var(--line);overflow-y:auto}
+.tb-right{display:flex;flex-direction:column;overflow:hidden}
+.tb-tabs{display:flex;border-bottom:1px solid var(--line);flex-shrink:0}
+.tb-tab{flex:1;padding:14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted2);border-bottom:2px solid transparent;transition:all .15s}
+.tb-tab.active{color:var(--text);border-bottom-color:var(--red)}
+.tb-tab-dots{display:flex;justify-content:center;gap:4px;margin-top:4px}
+.tb-tab-dot{width:6px;height:6px;border-radius:50%;background:var(--line2)}
+.tb-tab-dot.filled{background:var(--red)}
+.tb-search{padding:10px 12px;border-bottom:1px solid var(--line);flex-shrink:0}
+.tb-search-input{width:100%;background:var(--bg3);border:1px solid var(--line2);color:var(--text);padding:9px 12px 9px 34px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.tb-search-input:focus{border-color:var(--red)}
+.tb-search-wrap{position:relative}
+.tb-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.tb-list{flex:1;overflow-y:auto;padding:0}
+.tb-driver-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
+.tb-driver-row:hover{background:rgba(255,255,255,.04)}
+.tb-driver-row.selected{background:rgba(232,0,45,.06)}
+.tb-driver-img{width:56px;height:56px;border-radius:8px;object-fit:cover;object-position:top;flex-shrink:0;background:var(--bg3)}
+.tb-driver-img.constructor-logo{border-radius:6px;object-fit:contain;padding:6px;background:#1a1a1d}
+.tb-driver-info{flex:1;min-width:0}
+.tb-driver-name-small{font-size:11px;color:var(--muted2);font-weight:500}
+.tb-driver-name-big{font-size:15px;font-weight:700;letter-spacing:.2px}
+.tb-driver-team{font-size:11px;color:var(--muted2);margin-top:1px}
+.tb-driver-stats{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.tb-driver-price{font-size:16px;font-weight:700;color:var(--text)}
+.tb-driver-pts{font-size:11px;color:var(--muted2)}
+.tb-add-btn{width:32px;height:32px;border-radius:50%;background:var(--bg3);border:2px solid var(--line2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.tb-add-btn:hover{background:var(--red);border-color:var(--red);color:#fff}
+.tb-add-btn.added{background:var(--red);border-color:var(--red);color:#fff}
+.tb-add-btn.added::after{content:'✓'}
+.tb-add-btn.added .tb-plus{display:none}
+
+/* Left panel */
+.tb-budget{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:14px}
+.tb-budget-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tb-budget-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase}
+.tb-budget-val{font-size:22px;font-weight:700}
+.tb-budget-val.ok{color:var(--green)}
+.tb-budget-val.warn{color:var(--amber)}
+.tb-budget-val.danger{color:var(--red)}
+.tb-budget-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.tb-budget-fill{height:100%;border-radius:3px;transition:width .3s,background .3s}
+
+/* Driver slots */
+.tb-slots-title{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.tb-slots-title::after{content:'';flex:1;height:1px;background:var(--line)}
+.tb-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.tb-slot{background:var(--bg3);border:1px dashed var(--line2);border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px;min-height:58px;cursor:default;transition:all .15s}
+.tb-slot.filled{border-style:solid;border-color:var(--line2);background:var(--bg2)}
+.tb-slot.drs-slot{border-color:rgba(245,196,0,.4);background:rgba(245,196,0,.05)}
+.tb-slot-img{width:36px;height:36px;border-radius:6px;object-fit:cover;object-position:top;flex-shrink:0;background:var(--bg4)}
+.tb-slot-img.constructor-logo{object-fit:contain;padding:3px}
+.tb-slot-info{flex:1;min-width:0}
+.tb-slot-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-slot-price{font-size:10px;color:var(--muted2)}
+.tb-slot-drs{font-size:8px;background:var(--gold);color:#000;padding:1px 5px;border-radius:3px;font-weight:700;display:inline-block;margin-top:2px}
+.tb-slot-empty{font-size:11px;color:var(--muted);text-align:center;width:100%}
+.tb-slot-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px;flex-shrink:0}
+.tb-slot-remove:hover{color:var(--red)}
+
+/* DRS section in left panel */
+.drs-inline{background:rgba(245,196,0,.06);border:1px solid rgba(245,196,0,.2);border-radius:8px;padding:10px 12px;margin-bottom:14px}
+.drs-inline-title{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+.drs-inline-btns{display:flex;flex-wrap:wrap;gap:5px}
+.drs-inline-btn{padding:5px 10px;border-radius:16px;border:1px solid rgba(245,196,0,.3);background:transparent;color:var(--muted2);cursor:pointer;font-size:11px;font-weight:500;font-family:'Inter',sans-serif;transition:all .12s}
+.drs-inline-btn:hover{border-color:var(--gold);color:var(--gold)}
+.drs-inline-btn.active{background:rgba(245,196,0,.15);border-color:var(--gold);color:var(--gold)}
+
+/* Actions */
+.tb-actions{display:flex;gap:8px;margin-top:14px}
+.tb-save-btn{flex:1;background:var(--red);border:none;color:#fff;padding:12px;border-radius:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px}
+.tb-reset-btn{background:transparent;border:1px solid var(--line2);color:var(--muted2);padding:12px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif}
+
+@media(max-width:800px){
+  .team-builder{grid-template-columns:1fr;height:auto}
+  .tb-left{border-right:none;border-bottom:1px solid var(--line)}
+  .tb-list{max-height:400px}
+  .tb-slots{grid-template-columns:1fr}
+}
+
 /* ═══ RACE SELECTOR ═══ */
 .race-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
 .race-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--muted2);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;transition:all .15s}
@@ -272,64 +354,83 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px}
   </div>
 
   <!-- MŮJ TÝM -->
-  <div id="view-myteam" class="view">
-    <div class="pg-top">
-      <div><div class="pg-title">MŮJ <em>TÝM</em></div><div class="pg-sub" id="myteam-sub">Sestav svůj fantasy tým</div></div>
-      <button class="btn-red" onclick="saveMyTeam()">ULOŽIT TÝM</button>
-    </div>
+  <div id="view-myteam" class="view" style="padding:0">
+    <div class="team-builder">
 
-    <!-- Budget -->
-    <div class="budget-bar">
-      <div>
-        <div class="budget-num ok" id="budget-remaining">$100.0M</div>
-        <div class="budget-label">Zbývá z rozpočtu</div>
+      <!-- LEVÝ PANEL: sestavený tým -->
+      <div class="tb-left">
+
+        <!-- Budget -->
+        <div class="tb-budget">
+          <div class="tb-budget-top">
+            <span class="tb-budget-label">Cost Cap</span>
+            <span class="tb-budget-val ok" id="budget-remaining">$100.0M</span>
+          </div>
+          <div class="tb-budget-track">
+            <div class="tb-budget-fill" id="budget-fill" style="width:0%;background:var(--green)"></div>
+          </div>
+        </div>
+
+        <!-- Akce -->
+        <div class="tb-actions" style="margin-bottom:14px;margin-top:0">
+          <button class="tb-reset-btn" onclick="resetTeam()">Reset</button>
+          <button class="tb-save-btn" onclick="saveMyTeam()">💾 Uložit tým</button>
+        </div>
+
+        <!-- Jezdci sloty -->
+        <div class="tb-slots-title">Jezdci <span style="color:var(--muted);font-size:10px" id="drivers-count">0/5</span></div>
+        <div class="tb-slots" id="selected-drivers"></div>
+
+        <!-- DRS Boost -->
+        <div class="drs-inline" id="drs-section" style="display:none">
+          <div class="drs-inline-title">⚡ DRS Boost — 2× body</div>
+          <div class="drs-inline-btns" id="drs-grid"></div>
+        </div>
+
+        <!-- Konstruktéři sloty -->
+        <div class="tb-slots-title">Konstruktéři <span style="color:var(--muted);font-size:10px" id="constructors-count">0/2</span></div>
+        <div class="tb-slots" id="selected-constructors"></div>
+
+        <!-- Chipy -->
+        <div class="tb-slots-title" style="margin-top:14px">Chipy</div>
+        <div class="chips-grid" id="chips-grid" style="grid-template-columns:1fr 1fr;gap:6px"></div>
+
       </div>
-      <div class="budget-bar-track">
-        <div class="budget-bar-fill" id="budget-fill" style="width:0%;background:var(--budget-green)"></div>
+
+      <!-- PRAVÝ PANEL: výběr -->
+      <div class="tb-right">
+
+        <!-- Tabs Drivers / Constructors -->
+        <div class="tb-tabs">
+          <div class="tb-tab active" id="tab-drivers" onclick="switchTab('drivers')">
+            Drivers
+            <div class="tb-tab-dots" id="dots-drivers"></div>
+          </div>
+          <div class="tb-tab" id="tab-constructors" onclick="switchTab('constructors')">
+            Constructors
+            <div class="tb-tab-dots" id="dots-constructors"></div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="tb-search">
+          <div class="tb-search-wrap">
+            <span class="tb-search-icon">🔍</span>
+            <input class="tb-search-input" id="tb-search" placeholder="Search Drivers" oninput="filterList(this.value)">
+          </div>
+        </div>
+
+        <!-- Sort bar -->
+        <div style="padding:6px 14px;display:flex;gap:12px;font-size:11px;color:var(--muted2);border-bottom:1px solid var(--line);flex-shrink:0">
+          <span>Sort by:</span>
+          <span style="font-weight:700;color:var(--text2);cursor:pointer" onclick="sortList('pts')">Season Pts ↑</span>
+          <span style="cursor:pointer" onclick="sortList('price')">Value</span>
+        </div>
+
+        <!-- Driver/Constructor list -->
+        <div class="tb-list" id="tb-list"></div>
+
       </div>
-      <div class="budget-slots">
-        <div class="slot-count"><div class="slot-num" id="drivers-count">0/5</div><div class="slot-lbl">Jezdci</div></div>
-        <div class="slot-count"><div class="slot-num" id="constructors-count">0/2</div><div class="slot-lbl">Konstr.</div></div>
-      </div>
-    </div>
-
-    <!-- Vybraný tým -->
-    <div class="my-team-box">
-      <div class="my-team-hd">
-        <div class="my-team-title">SESTAVENÝ TÝM</div>
-        <span id="team-status" style="font-size:11px;color:var(--muted2)">Vyberte 5 jezdců a 2 konstruktéry</span>
-      </div>
-      <div class="my-team-body">
-        <div id="selected-drivers" class="team-slots"></div>
-        <div style="height:10px"></div>
-        <div id="selected-constructors" class="team-slots"></div>
-      </div>
-    </div>
-
-    <!-- DRS Boost -->
-    <div class="drs-section" id="drs-section" style="display:none">
-      <div class="drs-title">⚡ DRS BOOST — vyber jednoho jezdce (2× body)</div>
-      <div class="drs-grid" id="drs-grid"></div>
-    </div>
-
-    <!-- Chipy -->
-    <div class="chips-section">
-      <div class="chips-title">🎯 Chipy (použij jeden za závod)</div>
-      <div class="chips-grid" id="chips-grid"></div>
-    </div>
-
-    <!-- Jezdci -->
-    <div class="section-title">Jezdci</div>
-    <div class="driver-grid" id="drivers-grid"></div>
-
-    <!-- Konstruktéři -->
-    <div class="section-title">Konstruktéři</div>
-    <div class="driver-grid" id="constructors-grid"></div>
-
-    <!-- Přehled transferů -->
-    <div id="transfers-info" style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:16px;display:none">
-      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px">Transfery</div>
-      <div id="transfers-detail" style="font-size:13px;color:var(--text2)"></div>
     </div>
   </div>
 
@@ -704,14 +805,311 @@ function renderStandings(data) {
   }).join('');
 }
 
+
+// Fotky jezdců
+const DRIVER_IMG = {
+  'Max Verstappen':    'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/redbullracing/maxver01/2026redbullracingmaxver01right.webp',
+  'Isack Hadjar':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/redbullracing/isahad01/2026redbullracingisahad01right.webp',
+  'Lando Norris':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/mclaren/lannor01/2026mclarenlannor01right.webp',
+  'Oscar Piastri':     'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/mclaren/oscpia01/2026mclarenoscpia01right.webp',
+  'George Russell':    'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/mercedes/georus01/2026mercedesgeorus01right.webp',
+  'Kimi Antonelli':    'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/mercedes/andant01/2026mercedesandant01right.webp',
+  'Charles Leclerc':   'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/ferrari/chalec01/2026ferrarichalec01right.webp',
+  'Lewis Hamilton':    'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/ferrari/lewham01/2026ferrarilewham01right.webp',
+  'Fernando Alonso':   'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/astonmartin/feralo01/2026astonmartinferalo01right.webp',
+  'Lance Stroll':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/astonmartin/lanstr01/2026astonmartinlanstr01right.webp',
+  'Pierre Gasly':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/alpine/piegas01/2026alpinepiegas01right.webp',
+  'Franco Colapinto':  'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/alpine/fracol01/2026alpinefracol01right.webp',
+  'Esteban Ocon':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/haasf1team/estoco01/2026haasf1teamestoco01right.webp',
+  'Oliver Bearman':    'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/haasf1team/olibea01/2026haasf1teamolibea01right.webp',
+  'Liam Lawson':       'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/racingbulls/lialaw01/2026racingbullslialaw01right.webp',
+  'Arvid Lindblad':    'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/racingbulls/arvlin01/2026racingbullsarvlin01right.webp',
+  'Nico Hulkenberg':   'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/audi/nichul01/2026audinichul01right.webp',
+  'Gabriel Bortoleto': 'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/audi/gabbor01/2026audigabbor01right.webp',
+  'Carlos Sainz':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/williams/carsai01/2026williamscarsai01right.webp',
+  'Alexander Albon':   'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/williams/alealb01/2026williamsalealb01right.webp',
+  'Sergio Perez':      'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/cadillac/serper01/2026cadillacserper01right.webp',
+  'Valtteri Bottas':   'https://media.formula1.com/image/upload/c_lfill,w_320/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/v1740000001/common/f1/2026/cadillac/valbot01/2026cadillacvalbot01right.webp',
+};
+
+const CONSTRUCTOR_IMG = {
+  'Red Bull Racing': 'https://www.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing-logo.png',
+  'Ferrari':         'https://www.formula1.com/content/dam/fom-website/teams/2024/ferrari-logo.png',
+  'Mercedes':        'https://www.formula1.com/content/dam/fom-website/teams/2024/mercedes-logo.png',
+  'McLaren':         'https://www.formula1.com/content/dam/fom-website/teams/2024/mclaren-logo.png',
+  'Aston Martin':    'https://www.formula1.com/content/dam/fom-website/teams/2024/aston-martin-logo.png',
+  'Alpine':          'https://www.formula1.com/content/dam/fom-website/teams/2024/alpine-logo.png',
+  'Williams':        'https://www.formula1.com/content/dam/fom-website/teams/2024/williams-logo.png',
+  'Racing Bulls':    'https://www.formula1.com/content/dam/fom-website/teams/2024/rb-logo.png',
+  'Haas':            'https://www.formula1.com/content/dam/fom-website/teams/2024/haas-logo.png',
+  'Audi':            'https://www.formula1.com/content/dam/fom-website/teams/2024/kick-sauber-logo.png',
+  'Cadillac':        'https://www.formula1.com/content/dam/fom-website/teams/2024/haas-logo.png',
+};
+
+const CONSTRUCTOR_COLOR = {
+  'Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2',
+  'McLaren':'#FF8000','Aston Martin':'#229971','Alpine':'#FF87BC',
+  'Williams':'#64C4FF','Racing Bulls':'#6692FF','Haas':'#B6BABD',
+  'Audi':'#C00C18','Cadillac':'#FFFFFF',
+};
+
+let currentTab = 'drivers';
+let searchQuery = '';
+let sortMode = 'pts';
+
+// Dummy season points (dokud neni napojeni na API)
+const DRIVER_SEASON_PTS = {
+  'Max Verstappen':129,'Lando Norris':156,'Charles Leclerc':138,'Oscar Piastri':128,
+  'George Russell':153,'Kimi Antonelli':192,'Fernando Alonso':80,'Carlos Sainz':95,
+  'Lance Stroll':40,'Pierre Gasly':55,'Nico Hulkenberg':62,'Esteban Ocon':48,
+  'Oliver Bearman':71,'Isack Hadjar':88,'Liam Lawson':44,'Franco Colapinto':39,
+  'Gabriel Bortoleto':51,'Arvid Lindblad':33,'Alexander Albon':42,
+  'Sergio Perez':28,'Valtteri Bottas':21,'Lewis Hamilton':110,
+};
+const CONSTRUCTOR_SEASON_PTS = {
+  'McLaren':284,'Ferrari':248,'Mercedes':345,'Red Bull Racing':217,
+  'Aston Martin':120,'Alpine':94,'Williams':137,'Racing Bulls':132,
+  'Haas':119,'Audi':72,'Cadillac':49,
+};
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-drivers').classList.toggle('active', tab === 'drivers');
+  document.getElementById('tab-constructors').classList.toggle('active', tab === 'constructors');
+  document.getElementById('tb-search').value = '';
+  searchQuery = '';
+  renderList();
+}
+
+function filterList(q) {
+  searchQuery = q.toLowerCase();
+  renderList();
+}
+
+function sortList(mode) {
+  sortMode = mode;
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('tb-list');
+  if (!list) return;
+
+  if (currentTab === 'drivers') {
+    let items = DRIVERS.filter(d => d.toLowerCase().includes(searchQuery));
+    if (sortMode === 'pts') items.sort((a,b) => (DRIVER_SEASON_PTS[b]||0) - (DRIVER_SEASON_PTS[a]||0));
+    if (sortMode === 'price') items.sort((a,b) => (driverPrices[b]||0) - (driverPrices[a]||0));
+
+    list.innerHTML = items.map(d => {
+      const isSelected = myTeam.drivers.includes(d);
+      const img = DRIVER_IMG[d] || '';
+      const team = DRIVER_TEAM[d] || '';
+      const price = driverPrices[d] || 0;
+      const pts = DRIVER_SEASON_PTS[d] || 0;
+      const nameParts = d.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+      return '<div class="tb-driver-row ' + (isSelected ? 'selected' : '') + '" onclick="toggleDriverNew('' + d + '')">' +
+        (img ? '<img class="tb-driver-img" src="' + img + '" onerror="this.style.display='none'" alt="">' :
+               '<div class="tb-driver-img" style="display:flex;align-items:center;justify-content:center;font-size:18px">👤</div>') +
+        '<div class="tb-driver-info">' +
+          '<div class="tb-driver-name-small">' + firstName + '</div>' +
+          '<div class="tb-driver-name-big">' + lastName.toUpperCase() + '</div>' +
+          '<div class="tb-driver-team">' + team + '</div>' +
+        '</div>' +
+        '<div class="tb-driver-stats">' +
+          '<div class="tb-driver-price">$' + price.toFixed(1) + 'M</div>' +
+          '<div class="tb-driver-pts">' + pts + ' Pts</div>' +
+        '</div>' +
+        '<button class="tb-add-btn ' + (isSelected ? 'added' : '') + '" onclick="toggleDriverNew('' + d + '');event.stopPropagation()">' +
+          (isSelected ? '<span>✓</span>' : '<span class="tb-plus">+</span>') +
+        '</button>' +
+        '</div>';
+    }).join('');
+  } else {
+    let items = CONSTRUCTORS.filter(c => c.toLowerCase().includes(searchQuery));
+    if (sortMode === 'pts') items.sort((a,b) => (CONSTRUCTOR_SEASON_PTS[b]||0) - (CONSTRUCTOR_SEASON_PTS[a]||0));
+    if (sortMode === 'price') items.sort((a,b) => (constructorPrices[b]||0) - (constructorPrices[a]||0));
+
+    list.innerHTML = items.map(c => {
+      const isSelected = myTeam.constructors.includes(c);
+      const img = CONSTRUCTOR_IMG[c] || '';
+      const color = CONSTRUCTOR_COLOR[c] || '#888';
+      const price = constructorPrices[c] || 0;
+      const pts = CONSTRUCTOR_SEASON_PTS[c] || 0;
+      return '<div class="tb-driver-row ' + (isSelected ? 'selected' : '') + '" onclick="toggleConstructorNew('' + c + '')">' +
+        '<div class="tb-driver-img constructor-logo" style="border-left:3px solid ' + color + ';border-radius:6px">' +
+          (img ? '<img src="' + img + '" style="width:100%;height:100%;object-fit:contain;padding:4px" onerror="this.style.display='none'" alt="">' : '🏎') +
+        '</div>' +
+        '<div class="tb-driver-info">' +
+          '<div class="tb-driver-name-big">' + c.toUpperCase() + '</div>' +
+          '<div class="tb-driver-team">Constructor</div>' +
+        '</div>' +
+        '<div class="tb-driver-stats">' +
+          '<div class="tb-driver-price">$' + price.toFixed(1) + 'M</div>' +
+          '<div class="tb-driver-pts">' + pts + ' Pts</div>' +
+        '</div>' +
+        '<button class="tb-add-btn ' + (isSelected ? 'added' : '') + '" onclick="toggleConstructorNew('' + c + '');event.stopPropagation()">' +
+          (isSelected ? '<span>✓</span>' : '<span class="tb-plus">+</span>') +
+        '</button>' +
+        '</div>';
+    }).join('');
+  }
+}
+
+function toggleDriverNew(driver) {
+  if (myTeam.drivers.includes(driver)) {
+    myTeam.drivers = myTeam.drivers.filter(d => d !== driver);
+    if (myTeam.drsBoost === driver) myTeam.drsBoost = '';
+  } else {
+    if (myTeam.drivers.length >= 5) { toast('Max 5 jezdců', 'error'); return; }
+    let spent = myTeam.drivers.reduce((s,d) => s+(driverPrices[d]||0), 0) +
+                myTeam.constructors.reduce((s,c) => s+(constructorPrices[c]||0), 0) +
+                (driverPrices[driver]||0);
+    if (spent > BUDGET) { toast('Překročen budget $100M!', 'error'); return; }
+    myTeam.drivers.push(driver);
+  }
+  refreshTeamBuilder();
+}
+
+function toggleConstructorNew(constructor) {
+  if (myTeam.constructors.includes(constructor)) {
+    myTeam.constructors = myTeam.constructors.filter(c => c !== constructor);
+  } else {
+    if (myTeam.constructors.length >= 2) { toast('Max 2 konstruktéři', 'error'); return; }
+    let spent = myTeam.drivers.reduce((s,d) => s+(driverPrices[d]||0), 0) +
+                myTeam.constructors.reduce((s,c) => s+(constructorPrices[c]||0), 0) +
+                (constructorPrices[constructor]||0);
+    if (spent > BUDGET) { toast('Překročen budget $100M!', 'error'); return; }
+    myTeam.constructors.push(constructor);
+  }
+  refreshTeamBuilder();
+}
+
+function refreshTeamBuilder() {
+  renderBudgetNew();
+  renderSlotsNew();
+  renderDRSNew();
+  renderList();
+  renderTabDots();
+}
+
+function renderBudgetNew() {
+  let spent = myTeam.drivers.reduce((s,d) => s+(driverPrices[d]||0), 0) +
+              myTeam.constructors.reduce((s,c) => s+(constructorPrices[c]||0), 0);
+  const remaining = BUDGET - spent;
+  const pct = (spent / BUDGET) * 100;
+  const el = document.getElementById('budget-remaining');
+  if (el) {
+    el.textContent = '$' + remaining.toFixed(1) + 'M';
+    el.className = 'tb-budget-val ' + (remaining < 0 ? 'danger' : remaining < 10 ? 'warn' : 'ok');
+  }
+  const fill = document.getElementById('budget-fill');
+  if (fill) {
+    fill.style.width = Math.min(pct, 100) + '%';
+    fill.style.background = remaining < 0 ? 'var(--red)' : remaining < 10 ? 'var(--amber)' : 'var(--green)';
+  }
+  const dc = document.getElementById('drivers-count');
+  if (dc) dc.textContent = myTeam.drivers.length + '/5';
+  const cc = document.getElementById('constructors-count');
+  if (cc) cc.textContent = myTeam.constructors.length + '/2';
+}
+
+function renderSlotsNew() {
+  // Driver slots
+  const ds = document.getElementById('selected-drivers');
+  if (ds) {
+    let html = '';
+    for (let i = 0; i < 5; i++) {
+      const d = myTeam.drivers[i];
+      const isDRS = d && myTeam.drsBoost === d;
+      const img = d ? (DRIVER_IMG[d] || '') : '';
+      html += '<div class="tb-slot ' + (d ? 'filled' : '') + ' ' + (isDRS ? 'drs-slot' : '') + '">' +
+        (d ? (img ? '<img class="tb-slot-img" src="' + img + '" alt="">' : '<div class="tb-slot-img" style="display:flex;align-items:center;justify-content:center">👤</div>') : '') +
+        (d ?
+          '<div class="tb-slot-info">' +
+            '<div class="tb-slot-name">' + d.split(' ').pop() + '</div>' +
+            '<div class="tb-slot-price">$' + (driverPrices[d]||0).toFixed(1) + 'M' +
+              (isDRS ? ' <span class="tb-slot-drs">DRS</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<button class="tb-slot-remove" onclick="removeDriverNew('' + d + '')">✕</button>'
+          :
+          '<span class="tb-slot-empty">+ Add Driver</span>'
+        ) +
+        '</div>';
+    }
+    ds.innerHTML = html;
+  }
+
+  // Constructor slots
+  const cs = document.getElementById('selected-constructors');
+  if (cs) {
+    let html = '';
+    for (let i = 0; i < 2; i++) {
+      const c = myTeam.constructors[i];
+      const img = c ? (CONSTRUCTOR_IMG[c] || '') : '';
+      const color = c ? (CONSTRUCTOR_COLOR[c] || '#888') : 'transparent';
+      html += '<div class="tb-slot ' + (c ? 'filled' : '') + '">' +
+        (c ? '<div class="tb-slot-img constructor-logo" style="border-left:2px solid ' + color + '">' +
+                (img ? '<img src="' + img + '" style="width:100%;height:100%;object-fit:contain;padding:2px" alt="">' : '') +
+              '</div>' : '') +
+        (c ?
+          '<div class="tb-slot-info">' +
+            '<div class="tb-slot-name">' + c + '</div>' +
+            '<div class="tb-slot-price">$' + (constructorPrices[c]||0).toFixed(1) + 'M</div>' +
+          '</div>' +
+          '<button class="tb-slot-remove" onclick="removeConstructorNew('' + c + '')">✕</button>'
+          :
+          '<span class="tb-slot-empty">+ Add Constructor</span>'
+        ) +
+        '</div>';
+    }
+    cs.innerHTML = html;
+  }
+}
+
+function renderDRSNew() {
+  const section = document.getElementById('drs-section');
+  const grid = document.getElementById('drs-grid');
+  if (!section || !grid) return;
+  if (myTeam.drivers.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  grid.innerHTML = myTeam.drivers.map(d =>
+    '<button class="drs-inline-btn ' + (myTeam.drsBoost === d ? 'active' : '') + '" onclick="setDRS('' + d + '')">' +
+    (myTeam.drsBoost === d ? '⚡ ' : '') + d.split(' ').pop() + '</button>'
+  ).join('');
+}
+
+function renderTabDots() {
+  const dd = document.getElementById('dots-drivers');
+  const dc = document.getElementById('dots-constructors');
+  if (dd) dd.innerHTML = [0,1,2,3,4].map(i => '<div class="tb-tab-dot ' + (myTeam.drivers[i] ? 'filled' : '') + '"></div>').join('');
+  if (dc) dc.innerHTML = [0,1].map(i => '<div class="tb-tab-dot ' + (myTeam.constructors[i] ? 'filled' : '') + '"></div>').join('');
+}
+
+function removeDriverNew(d) {
+  myTeam.drivers = myTeam.drivers.filter(x => x !== d);
+  if (myTeam.drsBoost === d) myTeam.drsBoost = '';
+  refreshTeamBuilder();
+}
+
+function removeConstructorNew(c) {
+  myTeam.constructors = myTeam.constructors.filter(x => x !== c);
+  refreshTeamBuilder();
+}
+
+function resetTeam() {
+  if (confirm('Smazat celý tým?')) {
+    myTeam = { drivers: [], constructors: [], drsBoost: '' };
+    refreshTeamBuilder();
+  }
+}
+
 // ═══ MŮJ TÝM ═══
 function renderMyTeamView() {
-  renderDriversGrid();
-  renderConstructorsGrid();
-  renderSelectedTeam();
-  renderBudget();
-  renderDRSSection();
+  refreshTeamBuilder();
   renderChips();
+  renderList();
 }
 
 function renderBudget() {
