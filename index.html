@@ -1318,12 +1318,16 @@ function renderList() {
       const price = driverPrices[d]||0;
       const pts = DRIVER_SEASON_PTS[d]||0;
       const team = DRIVER_TEAM[d]||'';
-      return '<div class="tb-driver-row'+(sel?' selected':'')+'" onclick="tbToggleDriver(''+d+'')">' +
-        '<div class="tb-driver-img-wrap"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover;object-position:top center" onerror="this.parentNode.innerHTML='👤'" alt=""></div>' +
-        '<div class="tb-driver-info"><div class="tb-name-first">'+first+'</div><div class="tb-name-last">'+last.toUpperCase()+'</div><div class="tb-driver-sub">'+team+'</div></div>' +
-        '<div class="tb-driver-stats"><div class="tb-price">$'+price.toFixed(1)+'M</div><div class="tb-pts">'+pts+' Pts</div></div>' +
-        '<button class="tb-add-btn'+(sel?' added':'')+'" onclick="tbToggleDriver(''+d+'');event.stopPropagation()">'+(sel?'✓':'+')+'</button>' +
-        '</div>';
+      const row = document.createElement('div');
+      row.className = 'tb-driver-row' + (sel?' selected':'');
+      row.onclick = () => tbToggleDriver(d);
+      row.innerHTML =
+        '<div class="tb-driver-img-wrap"><img src="' + img + '" style="width:100%;height:100%;object-fit:cover;object-position:top center" alt=""></div>' +
+        '<div class="tb-driver-info"><div class="tb-name-first">' + first + '</div><div class="tb-name-last">' + last.toUpperCase() + '</div><div class="tb-driver-sub">' + team + '</div></div>' +
+        '<div class="tb-driver-stats"><div class="tb-price">$' + price.toFixed(1) + 'M</div><div class="tb-pts">' + pts + ' Pts</div></div>' +
+        '<button class="tb-add-btn' + (sel?' added':'') + '">' + (sel?'✓':'+') + '</button>';
+      row.querySelector('.tb-add-btn').onclick = (e) => { e.stopPropagation(); tbToggleDriver(d); };
+      return row.outerHTML;
     }).join('');
   } else {
     let items = CONSTRUCTORS.filter(c => c.toLowerCase().includes(searchQuery));
@@ -1335,12 +1339,16 @@ function renderList() {
       const color = CONSTRUCTOR_COLOR[c]||'#888';
       const price = constructorPrices[c]||0;
       const pts = CONSTRUCTOR_SEASON_PTS[c]||0;
-      return '<div class="tb-driver-row'+(sel?' selected':'')+'" onclick="tbToggleConstructor(''+c+'')">' +
-        '<div class="tb-constructor-img-wrap" style="border-left:3px solid '+color+';border-radius:6px"><img src="'+img+'" style="width:40px;height:40px;object-fit:contain" onerror="this.parentNode.innerHTML='🏎'" alt=""></div>' +
-        '<div class="tb-driver-info"><div class="tb-name-last">'+c.toUpperCase()+'</div><div class="tb-driver-sub">Constructor</div></div>' +
-        '<div class="tb-driver-stats"><div class="tb-price">$'+price.toFixed(1)+'M</div><div class="tb-pts">'+pts+' Pts</div></div>' +
-        '<button class="tb-add-btn'+(sel?' added':'')+'" onclick="tbToggleConstructor(''+c+'');event.stopPropagation()">'+(sel?'✓':'+')+'</button>' +
-        '</div>';
+      const row = document.createElement('div');
+      row.className = 'tb-driver-row' + (sel?' selected':'');
+      row.onclick = () => tbToggleConstructor(c);
+      row.innerHTML =
+        '<div class="tb-constructor-img-wrap" style="border-left:3px solid ' + color + ';border-radius:6px"><img src="' + img + '" style="width:40px;height:40px;object-fit:contain" alt=""></div>' +
+        '<div class="tb-driver-info"><div class="tb-name-last">' + c.toUpperCase() + '</div><div class="tb-driver-sub">Constructor</div></div>' +
+        '<div class="tb-driver-stats"><div class="tb-price">$' + price.toFixed(1) + 'M</div><div class="tb-pts">' + pts + ' Pts</div></div>' +
+        '<button class="tb-add-btn' + (sel?' added':'') + '">' + (sel?'✓':'+') + '</button>';
+      row.querySelector('.tb-add-btn').onclick = (e) => { e.stopPropagation(); tbToggleConstructor(c); };
+      return row.outerHTML;
     }).join('');
   }
 }
@@ -1380,55 +1388,93 @@ function tbRefresh() {
   if (fill) { fill.style.width=Math.min(spent/BUDGET*100,100)+'%'; fill.style.background=rem<0?'var(--red)':rem<10?'var(--amber)':'var(--green)'; }
   const dc = document.getElementById('drivers-count'); if(dc) dc.textContent=myTeam.drivers.length+'/5';
   const cc = document.getElementById('constructors-count'); if(cc) cc.textContent=myTeam.constructors.length+'/2';
-  // Driver slots
+
+  // Driver slots - pouzij createElement aby se predlo apostrofum
   const ds = document.getElementById('selected-drivers');
   if (ds) {
-    let h='';
+    ds.innerHTML = '';
     for(let i=0;i<5;i++){
-      const d=myTeam.drivers[i], isDRS=d&&myTeam.drsBoost===d, img=d?DRIVER_IMG[d]||'':'';
-      h+='<div class="tb-slot'+(d?' filled':'')+(isDRS?' drs-slot':'')+'">';
-      if(d) h+='<div class="tb-slot-img-wrap"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='👤'" alt=""></div>';
-      h+=d?'<div class="tb-slot-info"><div class="tb-slot-name">'+d.split(' ').pop()+(isDRS?' <span class="tb-slot-drs">DRS</span>':'')+
-            '</div><div class="tb-slot-price">$'+(driverPrices[d]||0).toFixed(1)+'M</div></div>'+
-            '<button class="tb-slot-remove" onclick="tbToggleDriver(''+d+'')">✕</button>':
-            '<span class="tb-slot-empty">+ Add Driver</span>';
-      h+='</div>';
+      const d=myTeam.drivers[i], isDRS=d&&myTeam.drsBoost===d;
+      const slot = document.createElement('div');
+      slot.className = 'tb-slot'+(d?' filled':'')+(isDRS?' drs-slot':'');
+      if(d) {
+        const img = DRIVER_IMG[d]||'';
+        const wrap = document.createElement('div'); wrap.className='tb-slot-img-wrap';
+        const im = document.createElement('img');
+        im.src=img; im.style.cssText='width:100%;height:100%;object-fit:cover;object-position:top'; im.alt='';
+        im.onerror=function(){this.parentNode.textContent='👤';};
+        wrap.appendChild(im); slot.appendChild(wrap);
+        const info = document.createElement('div'); info.className='tb-slot-info';
+        const nm = document.createElement('div'); nm.className='tb-slot-name';
+        nm.textContent = d.split(' ').pop();
+        if(isDRS){const sp=document.createElement('span');sp.className='tb-slot-drs';sp.textContent='DRS';nm.appendChild(sp);}
+        const pr = document.createElement('div'); pr.className='tb-slot-price';
+        pr.textContent='$'+(driverPrices[d]||0).toFixed(1)+'M';
+        info.appendChild(nm); info.appendChild(pr); slot.appendChild(info);
+        const btn=document.createElement('button'); btn.className='tb-slot-remove'; btn.textContent='✕';
+        (function(drv){btn.onclick=function(){tbToggleDriver(drv);};})(d);
+        slot.appendChild(btn);
+      } else {
+        const em=document.createElement('span'); em.className='tb-slot-empty'; em.textContent='+ Add Driver';
+        slot.appendChild(em);
+      }
+      ds.appendChild(slot);
     }
-    ds.innerHTML=h;
   }
+
   // Constructor slots
   const cs = document.getElementById('selected-constructors');
   if (cs) {
-    let h='';
+    cs.innerHTML = '';
     for(let i=0;i<2;i++){
-      const c=myTeam.constructors[i], img=c?CONSTRUCTOR_IMG[c]||'':'', color=c?CONSTRUCTOR_COLOR[c]||'#888':'transparent';
-      h+='<div class="tb-slot'+(c?' filled':'')+'">';
-      if(c) h+='<div class="tb-slot-img-wrap" style="border-left:2px solid '+color+'"><img src="'+img+'" style="width:100%;height:100%;object-fit:contain;padding:2px" onerror="this.parentNode.innerHTML='🏎'" alt=""></div>';
-      h+=c?'<div class="tb-slot-info"><div class="tb-slot-name">'+c+'</div><div class="tb-slot-price">$'+(constructorPrices[c]||0).toFixed(1)+'M</div></div>'+
-            '<button class="tb-slot-remove" onclick="tbToggleConstructor(''+c+'')">✕</button>':
-            '<span class="tb-slot-empty">+ Add Constructor</span>';
-      h+='</div>';
+      const c=myTeam.constructors[i];
+      const slot=document.createElement('div');
+      slot.className='tb-slot'+(c?' filled':'');
+      if(c) {
+        const img=CONSTRUCTOR_IMG[c]||'', color=CONSTRUCTOR_COLOR[c]||'#888';
+        const wrap=document.createElement('div'); wrap.className='tb-slot-img-wrap';
+        wrap.style.borderLeft='2px solid '+color;
+        const im=document.createElement('img');
+        im.src=img; im.style.cssText='width:100%;height:100%;object-fit:contain;padding:2px'; im.alt='';
+        im.onerror=function(){this.parentNode.textContent='🏎';};
+        wrap.appendChild(im); slot.appendChild(wrap);
+        const info=document.createElement('div'); info.className='tb-slot-info';
+        const nm=document.createElement('div'); nm.className='tb-slot-name'; nm.textContent=c;
+        const pr=document.createElement('div'); pr.className='tb-slot-price';
+        pr.textContent='$'+(constructorPrices[c]||0).toFixed(1)+'M';
+        info.appendChild(nm); info.appendChild(pr); slot.appendChild(info);
+        const btn=document.createElement('button'); btn.className='tb-slot-remove'; btn.textContent='✕';
+        (function(con){btn.onclick=function(){tbToggleConstructor(con);};})(c);
+        slot.appendChild(btn);
+      } else {
+        const em=document.createElement('span'); em.className='tb-slot-empty'; em.textContent='+ Add Constructor';
+        slot.appendChild(em);
+      }
+      cs.appendChild(slot);
     }
-    cs.innerHTML=h;
   }
+
   // DRS
-  const drsSection = document.getElementById('drs-section');
-  const drsGrid = document.getElementById('drs-grid');
+  const drsSection=document.getElementById('drs-section');
+  const drsGrid=document.getElementById('drs-grid');
   if(drsSection&&drsGrid){
     drsSection.style.display=myTeam.drivers.length?'block':'none';
-    drsGrid.innerHTML=myTeam.drivers.map(d=>'<button class="drs-inline-btn'+(myTeam.drsBoost===d?' active':'')+'" onclick="setDRS(''+d+'')">'+(myTeam.drsBoost===d?'⚡ ':'')+d.split(' ').pop()+'</button>').join('');
+    drsGrid.innerHTML='';
+    myTeam.drivers.forEach(function(d){
+      const btn=document.createElement('button');
+      btn.className='drs-inline-btn'+(myTeam.drsBoost===d?' active':'');
+      btn.textContent=(myTeam.drsBoost===d?'⚡ ':'')+d.split(' ').pop();
+      (function(drv){btn.onclick=function(){setDRS(drv);};})(d);
+      drsGrid.appendChild(btn);
+    });
   }
+
   // Tab dots
   const dd=document.getElementById('dots-drivers'),dc2=document.getElementById('dots-constructors');
-  if(dd) dd.innerHTML=[0,1,2,3,4].map(i=>'<div class="tb-tab-dot'+(myTeam.drivers[i]?' filled':'')+'"></div>').join('');
-  if(dc2) dc2.innerHTML=[0,1].map(i=>'<div class="tb-tab-dot'+(myTeam.constructors[i]?' filled':'')+'"></div>').join('');
-  // List
+  if(dd) dd.innerHTML=[0,1,2,3,4].map(function(i){return '<div class="tb-tab-dot'+(myTeam.drivers[i]?' filled':'')+'"></div>';}).join('');
+  if(dc2) dc2.innerHTML=[0,1].map(function(i){return '<div class="tb-tab-dot'+(myTeam.constructors[i]?' filled':'')+'"></div>';}).join('');
+
   renderList();
 }
 
-function resetTeam() {
-  if(confirm('Smazat celý tým?')){myTeam={drivers:[],constructors:[],drsBoost:''};tbRefresh();}
-}
-</script>
-</body>
-</html>
+
