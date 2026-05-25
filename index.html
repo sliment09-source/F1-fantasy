@@ -1080,10 +1080,7 @@ header {
           <label style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--muted2);text-transform:uppercase">Fastest Lap</label>
           <select class="fsel" id="adm-fl"></select>
         </div>
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <label style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--muted2);text-transform:uppercase">Driver of Day</label>
-          <select class="fsel" id="adm-dod"></select>
-        </div>
+
       </div>
       <!-- Positions gained -->
       <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin:16px 0 8px">Pozice gained / DNF (automaticky z API nebo zadej ručně)</div>
@@ -2578,7 +2575,7 @@ function selectAdminRace(id) {
     </div>`).join('');
   // FL, DOD
   const fl=document.getElementById('adm-fl');if(fl)fl.innerHTML=driverOpts();
-  const dod=document.getElementById('adm-dod');if(dod)dod.innerHTML=driverOpts();
+
 }
 
 async function saveAdminResults() {
@@ -2602,7 +2599,6 @@ async function saveAdminResults() {
     p9:document.getElementById('adm-p9')?.value||'',
     p10:document.getElementById('adm-p10')?.value||'',
     fastestLap:document.getElementById('adm-fl')?.value||'',
-    driverOfDay:document.getElementById('adm-dod')?.value||'',
     positionsGained: posGained
   };
   try{
@@ -3026,8 +3022,19 @@ async function loadFantasyF1Results() {
           if(endResult === 'DNF') {
             pgEl.value = 'DNF';
           } else if(typeof endResult === 'number') {
-            const gained = startPos - endResult; // kladne = posunul se dopredu
+            const gained = startPos - endResult;
             pgEl.value = gained > 0 ? '+'+gained : String(gained);
+          }
+        });
+
+        // Jezdci kteri startovali v kvali ale nejsou v race results = DNS
+        qualiRes.forEach(qr => {
+          const driverName = qualiNumToName[qr.driver_number];
+          if(!driverName) return;
+          const pgEl = document.getElementById('pg-'+driverName.replace(/ /g,'_'));
+          if(!pgEl || pgEl.value) return; // uz ma hodnotu
+          if(!(driverName in finishPos)) {
+            pgEl.value = 'DNS'; // Did Not Start - pocita se jako DNF
           }
         });
       }
