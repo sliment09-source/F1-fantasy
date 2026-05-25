@@ -982,52 +982,74 @@ header {
 
 
 <!-- MŮJ TÝM -->
-<div id="view-myteam" class="view">
-  <div class="pg-top">
-    <div><div class="pg-title">MŮJ <em>TÝM</em></div><div class="pg-sub">Sestav svůj fantasy tým</div></div>
-    <button class="btn-ghost" onclick="saveMyTeam()">💾 Uložit tým</button>
+<div id="view-myteam" class="view" style="padding:0;overflow:hidden">
+  <div style="display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 56px);overflow:hidden">
+
+    <!-- LEVY PANEL -->
+    <div style="border-right:1px solid var(--line);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)">
+
+      <!-- Budget -->
+      <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:10px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase">Cost Cap</span>
+          <span id="budget-remaining" style="font-size:20px;font-weight:700;color:var(--green)">$100.0M</span>
+        </div>
+        <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">
+          <div id="budget-fill" style="height:100%;border-radius:3px;background:var(--green);transition:width .3s,background .3s;width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted2)">
+          <span>Jezdci: <b id="drivers-count">0/5</b></span>
+          <span>Konstruktéři: <b id="constructors-count">0/2</b></span>
+        </div>
+      </div>
+
+      <!-- Driver slots -->
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:8px">JEZDCI <span style="flex:1;height:1px;background:var(--line)"></span></div>
+      <div id="driver-slots" style="display:flex;flex-direction:column;gap:6px"></div>
+
+      <!-- DRS -->
+      <div id="drs-section" style="display:none;background:rgba(245,196,0,.05);border:1px solid rgba(245,196,0,.2);border-radius:8px;padding:10px 12px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px">⚡ DRS Boost — 2× body</div>
+        <div id="drs-grid" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+      </div>
+
+      <!-- Constructor slots -->
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:8px">KONSTRUKTÉŘI <span style="flex:1;height:1px;background:var(--line)"></span></div>
+      <div id="constructor-slots" style="display:flex;flex-direction:column;gap:6px"></div>
+
+      <!-- Buttons -->
+      <button onclick="resetTeam()" style="background:transparent;border:1px solid var(--line2);color:var(--muted2);padding:8px;border-radius:9px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;width:100%">↺ Reset týmu</button>
+      <button onclick="saveMyTeam()" style="width:100%;background:var(--red);border:none;color:#fff;padding:11px;border-radius:9px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px">💾 ULOŽIT TÝM</button>
+    </div>
+
+    <!-- PRAVY PANEL -->
+    <div style="display:flex;flex-direction:column;overflow:hidden;background:var(--bg)">
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:1px solid var(--line);flex-shrink:0">
+        <div id="tab-drivers" onclick="switchFTab('drivers')" style="flex:1;padding:14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);border-bottom:2px solid var(--red)">
+          Drivers
+          <div style="display:flex;justify-content:center;gap:3px;margin-top:4px" id="dots-drivers"></div>
+        </div>
+        <div id="tab-constructors" onclick="switchFTab('constructors')" style="flex:1;padding:14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted2);border-bottom:2px solid transparent">
+          Constructors
+          <div style="display:flex;justify-content:center;gap:3px;margin-top:4px" id="dots-constructors"></div>
+        </div>
+      </div>
+      <!-- Search -->
+      <div style="padding:8px 12px;border-bottom:1px solid var(--line);flex-shrink:0">
+        <input id="tb-search" placeholder="🔍 Search..." oninput="filterFList(this.value)"
+          style="width:100%;background:var(--bg3);border:1px solid var(--line2);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none">
+      </div>
+      <!-- Sort -->
+      <div style="padding:5px 14px;display:flex;gap:12px;font-size:11px;color:var(--muted2);border-bottom:1px solid var(--line);flex-shrink:0;align-items:center">
+        <span>Sort:</span>
+        <span id="fsort-pts" onclick="sortFList('pts')" style="cursor:pointer;font-weight:600;color:var(--text)">Season Pts ↑</span>
+        <span id="fsort-price" onclick="sortFList('price')" style="cursor:pointer">Value</span>
+      </div>
+      <!-- List -->
+      <div id="tb-list" style="flex:1;overflow-y:auto"></div>
+    </div>
   </div>
-
-  <!-- Budget bar -->
-  <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px">
-    <div>
-      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:2px">Cost Cap</div>
-      <div id="budget-remaining" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green);letter-spacing:-1px">$100.0M</div>
-    </div>
-    <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden">
-      <div id="budget-fill" style="height:100%;border-radius:4px;background:var(--green);transition:width .3s,background .3s;width:0%"></div>
-    </div>
-    <div style="text-align:center">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px" id="drivers-count">0/5</div>
-      <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Jezdci</div>
-    </div>
-    <div style="text-align:center">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px" id="constructors-count">0/2</div>
-      <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Konstr.</div>
-    </div>
-  </div>
-
-  <!-- Vybrany tym -->
-  <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:16px;margin-bottom:20px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px">VYBRANÝ TÝM <span style="flex:1;height:1px;background:var(--line)"></span></div>
-    <div id="selected-team" style="display:flex;flex-wrap:wrap;gap:8px">
-      <div style="color:var(--muted);font-size:13px">Zatím žádní jezdci — vyber níže</div>
-    </div>
-  </div>
-
-  <!-- DRS Boost -->
-  <div id="drs-section" style="display:none;background:rgba(245,196,0,.05);border:1px solid rgba(245,196,0,.2);border-radius:10px;padding:14px 16px;margin-bottom:20px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:10px">⚡ DRS Boost — 2× body</div>
-    <div id="drs-grid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-  </div>
-
-  <!-- Jezdci -->
-  <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px">JEZDCI <span style="flex:1;height:1px;background:var(--line)"></span></div>
-  <div id="drivers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:24px"></div>
-
-  <!-- Konstrukteri -->
-  <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px">KONSTRUKTÉŘI <span style="flex:1;height:1px;background:var(--line)"></span></div>
-  <div id="constructors-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:24px"></div>
 </div>
 
 <!-- VŠECHNY TÝMY -->
@@ -2596,6 +2618,230 @@ function hideOverlay() {
   const adminBtn=document.getElementById('admin-btn');if(adminBtn)adminBtn.style.display=isAdmin?'':'none';
   fantasyInit();
 }
+
+
+// ═══ FANTASY TÝM — NOVÝ LAYOUT ═══
+const DRIVER_SEASON_PTS_F = {
+  'Max Verstappen':155,'Lando Norris':156,'Charles Leclerc':165,'Oscar Piastri':128,
+  'George Russell':157,'Kimi Antonelli':254,'Fernando Alonso':80,'Carlos Sainz':95,
+  'Lance Stroll':40,'Pierre Gasly':55,'Nico Hulkenberg':62,'Esteban Ocon':48,
+  'Oliver Bearman':71,'Isack Hadjar':88,'Liam Lawson':44,'Franco Colapinto':39,
+  'Gabriel Bortoleto':51,'Arvid Lindblad':33,'Alexander Albon':42,
+  'Sergio Perez':28,'Valtteri Bottas':21,'Lewis Hamilton':110
+};
+
+let fCurrentTab = 'drivers';
+let fSearchQuery = '';
+let fSortMode = 'pts';
+
+function switchFTab(tab) {
+  fCurrentTab = tab;
+  const td = document.getElementById('tab-drivers');
+  const tc = document.getElementById('tab-constructors');
+  if(td){td.style.color=tab==='drivers'?'var(--text)':'var(--muted2)';td.style.borderBottomColor=tab==='drivers'?'var(--red)':'transparent';}
+  if(tc){tc.style.color=tab==='constructors'?'var(--text)':'var(--muted2)';tc.style.borderBottomColor=tab==='constructors'?'var(--red)':'transparent';}
+  const inp = document.getElementById('tb-search');
+  if(inp){inp.value='';fSearchQuery='';}
+  renderFList();
+}
+
+function filterFList(q){fSearchQuery=q.toLowerCase();renderFList();}
+
+function sortFList(mode) {
+  fSortMode = mode;
+  document.getElementById('fsort-pts').style.fontWeight = mode==='pts'?'700':'400';
+  document.getElementById('fsort-pts').style.color = mode==='pts'?'var(--text)':'var(--muted2)';
+  document.getElementById('fsort-price').style.fontWeight = mode==='price'?'700':'400';
+  document.getElementById('fsort-price').style.color = mode==='price'?'var(--text)':'var(--muted2)';
+  renderFList();
+}
+
+function renderFList() {
+  const list = document.getElementById('tb-list');
+  if(!list) return;
+
+  if(fCurrentTab === 'drivers') {
+    let items = DRIVERS.filter(d => d!=='TBA' && d.toLowerCase().includes(fSearchQuery));
+    if(fSortMode==='pts') items.sort((a,b)=>(DRIVER_SEASON_PTS_F[b]||0)-(DRIVER_SEASON_PTS_F[a]||0));
+    else items.sort((a,b)=>(driverPrices[b]||0)-(driverPrices[a]||0));
+
+    list.innerHTML = items.map(d => {
+      const sel = myTeam.drivers.includes(d);
+      const info = DRIVER_INFO[d]||{};
+      const parts = d.split(' ');
+      const first = parts[0], last = parts.slice(1).join(' ');
+      const price = driverPrices[d]||0;
+      const pts = DRIVER_SEASON_PTS_F[d]||0;
+      const team = DRIVER_TEAM_F[d]||'';
+      return `<div onclick="toggleDriver('${d}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;background:${sel?'rgba(232,0,45,.05)':'transparent'};transition:background .12s" onmouseover="this.style.background='${sel?'rgba(232,0,45,.08)':'rgba(255,255,255,.03)'}'" onmouseout="this.style.background='${sel?'rgba(232,0,45,.05)':'transparent'}'">
+        <div style="width:52px;height:52px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--bg3)">
+          <img src="${info.img||''}" style="width:100%;height:100%;object-fit:cover;object-position:top center" onerror="this.parentNode.innerHTML='👤'" alt="">
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--muted2)">${first}</div>
+          <div style="font-size:14px;font-weight:700;letter-spacing:.2px">${last.toUpperCase()}</div>
+          <div style="font-size:11px;color:var(--muted2);margin-top:1px">${team}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0">
+          <div style="font-size:15px;font-weight:700">$${price.toFixed(1)}M</div>
+          <div style="font-size:10px;color:var(--muted2)">${pts} Pts</div>
+        </div>
+        <button onclick="event.stopPropagation();toggleDriver('${d}')" style="width:32px;height:32px;border-radius:50%;background:${sel?'var(--red)':'var(--bg3)'};border:2px solid ${sel?'var(--red)':'var(--line2)'};color:${sel?'#fff':'var(--text)'};font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">${sel?'✓':'+'}</button>
+      </div>`;
+    }).join('');
+  } else {
+    let items = CONSTRUCTORS.filter(c => c.toLowerCase().includes(fSearchQuery));
+    items.sort((a,b) => fSortMode==='pts' ? 0 : (constructorPrices[b]||0)-(constructorPrices[a]||0));
+    list.innerHTML = items.map(c => {
+      const sel = myTeam.constructors.includes(c);
+      const info = TEAM_INFO[c]||{};
+      const price = constructorPrices[c]||0;
+      return `<div onclick="toggleConstructor('${c}')" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;background:${sel?'rgba(232,0,45,.05)':'transparent'};transition:background .12s">
+        <div style="width:52px;height:52px;border-radius:6px;overflow:hidden;flex-shrink:0;padding:4px;background:var(--bg3);display:flex;align-items:center;justify-content:center;border-left:3px solid ${info.color||'#888'}">
+          <img src="${info.logo||''}" style="width:40px;height:40px;object-fit:contain" onerror="this.parentNode.innerHTML='🏎'" alt="">
+        </div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">${c.toUpperCase()}</div>
+          <div style="font-size:11px;color:var(--muted2)">Constructor</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:15px;font-weight:700">$${price.toFixed(1)}M</div>
+        </div>
+        <button onclick="event.stopPropagation();toggleConstructor('${c}')" style="width:32px;height:32px;border-radius:50%;background:${sel?'var(--red)':'var(--bg3)'};border:2px solid ${sel?'var(--red)':'var(--line2)'};color:${sel?'#fff':'var(--text)'};font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">${sel?'✓':'+'}</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderSlots() {
+  // Driver slots
+  const ds = document.getElementById('driver-slots');
+  if(ds) {
+    ds.innerHTML = '';
+    for(let i=0;i<5;i++){
+      const d = myTeam.drivers[i];
+      const isDRS = d && myTeam.drsBoost===d;
+      const slot = document.createElement('div');
+      slot.style.cssText = `background:${d?'var(--bg2)':'var(--bg3)'};border:1px ${d?'solid':'dashed'} ${isDRS?'rgba(245,196,0,.4)':d?'var(--line2)':'var(--line)'};border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:50px`;
+      if(d) {
+        const info = DRIVER_INFO[d]||{};
+        const wrap = document.createElement('div');
+        wrap.style.cssText='width:32px;height:32px;border-radius:5px;overflow:hidden;flex-shrink:0;background:var(--bg4)';
+        const im = document.createElement('img');
+        im.src=info.img||''; im.style.cssText='width:100%;height:100%;object-fit:cover;object-position:top'; im.alt='';
+        im.onerror=function(){this.parentNode.textContent='👤';};
+        wrap.appendChild(im); slot.appendChild(wrap);
+        const info2 = document.createElement('div'); info2.style.flex='1';
+        const nm = document.createElement('div'); nm.style.cssText='font-size:12px;font-weight:600';
+        nm.textContent=d.split(' ').pop()+(isDRS?' ⚡':'');
+        const pr = document.createElement('div'); pr.style.cssText='font-size:10px;color:var(--muted2)';
+        pr.textContent='$'+(driverPrices[d]||0).toFixed(1)+'M';
+        info2.appendChild(nm); info2.appendChild(pr); slot.appendChild(info2);
+        const btn=document.createElement('button'); btn.style.cssText='background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px';
+        btn.textContent='✕'; (function(drv){btn.onclick=function(){removeDriver(drv);};})(d);
+        slot.appendChild(btn);
+      } else {
+        const em=document.createElement('span'); em.style.cssText='font-size:11px;color:var(--muted)';
+        em.textContent='+ Add Driver'; slot.appendChild(em);
+      }
+      ds.appendChild(slot);
+    }
+  }
+
+  // Constructor slots
+  const cs = document.getElementById('constructor-slots');
+  if(cs) {
+    cs.innerHTML = '';
+    for(let i=0;i<2;i++){
+      const c = myTeam.constructors[i];
+      const slot = document.createElement('div');
+      slot.style.cssText = `background:${c?'var(--bg2)':'var(--bg3)'};border:1px ${c?'solid':'dashed'} ${c?'var(--line2)':'var(--line)'};border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:50px`;
+      if(c) {
+        const info = TEAM_INFO[c]||{};
+        const wrap = document.createElement('div');
+        wrap.style.cssText=`width:32px;height:32px;border-radius:5px;overflow:hidden;flex-shrink:0;background:var(--bg4);border-left:2px solid ${info.color||'#888'};padding:2px`;
+        const im = document.createElement('img');
+        im.src=info.logo||''; im.style.cssText='width:100%;height:100%;object-fit:contain'; im.alt='';
+        im.onerror=function(){this.parentNode.textContent='🏎';};
+        wrap.appendChild(im); slot.appendChild(wrap);
+        const info2 = document.createElement('div'); info2.style.flex='1';
+        const nm = document.createElement('div'); nm.style.cssText='font-size:12px;font-weight:600'; nm.textContent=c;
+        const pr = document.createElement('div'); pr.style.cssText='font-size:10px;color:var(--muted2)';
+        pr.textContent='$'+(constructorPrices[c]||0).toFixed(1)+'M';
+        info2.appendChild(nm); info2.appendChild(pr); slot.appendChild(info2);
+        const btn=document.createElement('button'); btn.style.cssText='background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px';
+        btn.textContent='✕'; (function(con){btn.onclick=function(){removeConstructor(con);};})(c);
+        slot.appendChild(btn);
+      } else {
+        const em=document.createElement('span'); em.style.cssText='font-size:11px;color:var(--muted)';
+        em.textContent='+ Add Constructor'; slot.appendChild(em);
+      }
+      cs.appendChild(slot);
+    }
+  }
+
+  // DRS
+  const drsSection=document.getElementById('drs-section');
+  const drsGrid=document.getElementById('drs-grid');
+  if(drsSection&&drsGrid){
+    drsSection.style.display=myTeam.drivers.length?'block':'none';
+    drsGrid.innerHTML='';
+    myTeam.drivers.forEach(function(d){
+      const btn=document.createElement('button');
+      const active=myTeam.drsBoost===d;
+      btn.style.cssText=`padding:4px 9px;border-radius:14px;border:1px solid ${active?'var(--gold)':'rgba(245,196,0,.3)'};background:${active?'rgba(245,196,0,.15)':'transparent'};color:${active?'var(--gold)':'var(--muted2)'};cursor:pointer;font-size:11px;font-family:'Inter',sans-serif`;
+      btn.textContent=(active?'⚡ ':'')+d.split(' ').pop();
+      (function(drv){btn.onclick=function(){setDRS(drv);};})(d);
+      drsGrid.appendChild(btn);
+    });
+  }
+
+  // Tab dots
+  const dd=document.getElementById('dots-drivers');
+  const dc=document.getElementById('dots-constructors');
+  if(dd) dd.innerHTML=[0,1,2,3,4].map(i=>`<div style="width:6px;height:6px;border-radius:50%;background:${myTeam.drivers[i]?'var(--red)':'var(--line2)'}">`).join('');
+  if(dc) dc.innerHTML=[0,1].map(i=>`<div style="width:6px;height:6px;border-radius:50%;background:${myTeam.constructors[i]?'var(--red)':'var(--line2)'}">`).join('');
+}
+
+function renderMyTeam() {
+  renderBudget();
+  renderSlots();
+  renderFList();
+}
+
+// Override toggle funkce aby volaly renderSlots
+function toggleDriver(d) {
+  if(myTeam.drivers.includes(d)){removeDriver(d);return;}
+  if(myTeam.drivers.length>=5){toast('Max 5 jezdců','error');return;}
+  const spent=myTeam.drivers.reduce((s,x)=>s+(driverPrices[x]||0),0)+myTeam.constructors.reduce((s,x)=>s+(constructorPrices[x]||0),0)+(driverPrices[d]||0);
+  if(spent>BUDGET){toast('Překročen budget $100M!','error');return;}
+  myTeam.drivers.push(d);
+  renderBudget(); renderSlots(); renderFList();
+}
+
+function toggleConstructor(c) {
+  if(myTeam.constructors.includes(c)){removeConstructor(c);return;}
+  if(myTeam.constructors.length>=2){toast('Max 2 konstruktéři','error');return;}
+  const spent=myTeam.drivers.reduce((s,x)=>s+(driverPrices[x]||0),0)+myTeam.constructors.reduce((s,x)=>s+(constructorPrices[x]||0),0)+(constructorPrices[c]||0);
+  if(spent>BUDGET){toast('Překročen budget $100M!','error');return;}
+  myTeam.constructors.push(c);
+  renderBudget(); renderSlots(); renderFList();
+}
+
+function removeDriver(d){myTeam.drivers=myTeam.drivers.filter(x=>x!==d);if(myTeam.drsBoost===d)myTeam.drsBoost='';renderBudget();renderSlots();renderFList();}
+function removeConstructor(c){myTeam.constructors=myTeam.constructors.filter(x=>x!==c);renderBudget();renderSlots();renderFList();}
+function setDRS(d){myTeam.drsBoost=myTeam.drsBoost===d?'':d;renderSlots();}
+function resetTeam(){myTeam={drivers:[],constructors:[],drsBoost:''};renderMyTeam();}
+
+// Mobile responsive
+const mq = window.matchMedia('(max-width:800px)');
+function handleMobileMyTeam(){
+  const tb=document.querySelector('#view-myteam > div');
+  if(!tb) return;
+  if(mq.matches){tb.style.gridTemplateColumns='1fr';tb.style.height='auto';}
+  else{tb.style.gridTemplateColumns='340px 1fr';tb.style.height='calc(100vh - 56px)';}
+}
+mq.addEventListener('change', handleMobileMyTeam);
 
 </script>
 </body>
