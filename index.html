@@ -946,9 +946,13 @@ header {
     <div class="hdr-title">FANTASY LIGA 2026</div>
     <nav class="hdr-nav">
       <button class="nav-btn active" onclick="showView('standings',event)">🏆 Pořadí</button>
-      <button class="nav-btn" onclick="showView('tip',event)">✏ Tipovat</button>
-      <button class="nav-btn" onclick="showView('saved',event)">📋 Tipy</button>
-      <button class="nav-btn admin-btn" onclick="showViewAdmin(this)">⚑ Výsledky</button>
+      <button class="nav-btn" onclick="showView('myteam',event)">⚙ Můj tým</button>
+      <button class="nav-btn" onclick="showView('allteams',event)">👥 Týmy</button>
+      <button class="nav-btn admin-btn" id="admin-btn" onclick="showView('admin',event)" style="display:none">📊 Admin</button>
+      <div class="user-badge" id="user-badge" onclick="confirmLogout()">
+        <div class="user-badge-avatar" id="user-badge-avatar">?</div>
+        <span id="user-badge-name">—</span>
+      </div>
     </nav>
   </div>
 </header>
@@ -976,134 +980,94 @@ header {
   </div>
 </div>
 
-<!-- TIP -->
-<div id="view-tip" class="view">
+
+<!-- MŮJ TÝM -->
+<div id="view-myteam" class="view">
   <div class="pg-top">
-    <div><div class="pg-title">ZADAT <em>TIP</em></div><div class="pg-sub" id="tip-pg-sub">Nejdřív vyber hráče</div></div>
+    <div><div class="pg-title">MŮJ <em>TÝM</em></div><div class="pg-sub">Sestav svůj fantasy tým</div></div>
+    <button class="btn-ghost" onclick="saveMyTeam()">💾 Uložit tým</button>
   </div>
 
-  <!-- KROK 1: výběr hráče -->
-  <div id="player-pick-screen">
-    <div class="pick-section">
-      <div class="pick-label">Kdo tipuje?</div>
-      <div class="pick-grid" id="player-pick-cards"></div>
+  <!-- Budget bar -->
+  <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:2px">Cost Cap</div>
+      <div id="budget-remaining" style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green);letter-spacing:-1px">$100.0M</div>
+    </div>
+    <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden">
+      <div id="budget-fill" style="height:100%;border-radius:4px;background:var(--green);transition:width .3s,background .3s;width:0%"></div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px" id="drivers-count">0/5</div>
+      <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Jezdci</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px" id="constructors-count">0/2</div>
+      <div style="font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px">Konstr.</div>
     </div>
   </div>
 
-  <!-- Aktivní hráč lišta -->
-  <div class="player-bar" id="active-player-bar">
-    <div class="pb-avatar" id="apb-avatar"></div>
-    <div class="pb-info"><div class="pb-name" id="apb-name"></div><div class="pb-label">Aktivní hráč</div></div>
-    <button class="btn-ghost" onclick="changePlayer()">Změnit hráče</button>
+  <!-- Vybrany tym -->
+  <div style="background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:16px;margin-bottom:20px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px">VYBRANÝ TÝM <span style="flex:1;height:1px;background:var(--line)"></span></div>
+    <div id="selected-team" style="display:flex;flex-wrap:wrap;gap:8px">
+      <div style="color:var(--muted);font-size:13px">Zatím žádní jezdci — vyber níže</div>
+    </div>
   </div>
 
-  <!-- KROK 2: závody -->
-  <div id="races-section" style="display:none">
-    <div class="wknds" id="race-group-list"></div>
+  <!-- DRS Boost -->
+  <div id="drs-section" style="display:none;background:rgba(245,196,0,.05);border:1px solid rgba(245,196,0,.2);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:10px">⚡ DRS Boost — 2× body</div>
+    <div id="drs-grid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
 
-  <!-- Formulář tipu -->
-  <div class="tip-form" id="tip-form-container" style="display:none">
-    <div class="form-hd">
-      <div><div class="form-race-nm" id="form-race-title"></div><div class="form-race-dt" id="form-race-date"></div></div>
-      <span id="form-sprint-badge" class="sprint-badge" style="display:none">◈ SPRINT</span>
-      <div style="margin-left:auto"><button class="btn-ghost" onclick="hideForm()">← Zpět</button></div>
-    </div>
-    <div id="form-lock-banner" class="form-locked-banner" style="display:none">
-      <span class="form-locked-icon">🔒</span>
-      <div><strong>Tipy jsou uzavřeny</strong><br><span style="font-size:12px;color:var(--muted)">Kvalifikace již začala — tipy nelze měnit</span></div>
-    </div>
-    <div class="form-bd">
-      <div class="sec-tag">Top 5 pořadí</div>
-      <div class="t5grid" id="top5-selects"></div>
-      <div class="divider"></div>
-      <div class="extras">
-        <div class="fgrp"><label class="flbl">Pole Position</label><div class="driver-picker" id="f-pole-picker" data-field="f-pole"></div><input type="hidden" id="f-pole"></div>
-        <div class="fgrp"><label class="flbl">Fastest Lap</label><div class="driver-picker" id="f-fl-picker" data-field="f-fl"></div><input type="hidden" id="f-fl"></div>
-        <div class="fgrp"><label class="flbl">Nejlepší tým</label><div class="team-picker" id="f-team-picker" data-field="f-team"></div><input type="hidden" id="f-team"></div>
-      </div>
-      <div class="divider"></div>
-      <div class="extras">
-        <div class="fgrp"><label class="flbl">Počet DNF</label><input type="number" class="finput" id="f-dnf" min="0" max="20" value="0" style="width:80px"></div>
-        <div class="fgrp"><label class="flbl">Safety Car?</label><div class="sc-row"><button class="toggle" id="sc-ano" onclick="toggleSC('ANO')">ANO</button><button class="toggle" id="sc-ne" onclick="toggleSC('NE')">NE</button></div></div>
-      </div>
-      <div class="form-acts">
-        <span class="save-status" id="save-status"></span>
-        <button class="btn-ghost" onclick="clearForm()">Vymazat</button>
-        <button class="btn-red" id="save-btn" onclick="saveTip()">ULOŽIT TIP</button>
-      </div>
-    </div>
-  </div>
+  <!-- Jezdci -->
+  <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px">JEZDCI <span style="flex:1;height:1px;background:var(--line)"></span></div>
+  <div id="drivers-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:24px"></div>
+
+  <!-- Konstrukteri -->
+  <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px">KONSTRUKTÉŘI <span style="flex:1;height:1px;background:var(--line)"></span></div>
+  <div id="constructors-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:24px"></div>
 </div>
 
-<!-- SAVED -->
-<div id="view-saved" class="view">
+<!-- VŠECHNY TÝMY -->
+<div id="view-allteams" class="view">
   <div class="pg-top">
-    <div><div class="pg-title">ULOŽENÉ <em>TIPY</em></div></div>
-    <button class="btn-ghost" onclick="loadTips()">↻ Sheets</button>
+    <div><div class="pg-title">TÝMY <em>HRÁČŮ</em></div></div>
+    <button class="btn-ghost" onclick="loadAllTeams()">↻ Obnovit</button>
   </div>
-  <div class="filter-bar">
-    <span class="filter-lbl">Hráč:</span>
-    <button class="fbtn active" onclick="filterTips('all',this)">Všichni</button>
-    <span id="player-filter-btns"></span>
-    <button class="fbtn active" id="source-filter-btn" onclick="toggleSourceFilter(this)" style="margin-left:8px">Sheets + Lokální</button>
-  </div>
-  <div id="tips-list"></div>
+  <div id="all-teams-body"></div>
 </div>
 
-<!-- VÝSLEDKY -->
-<div id="view-results" class="view">
+<!-- ADMIN -->
+<div id="view-admin" class="view">
   <div class="pg-top">
-    <div><div class="pg-title">VÝSLEDKY <em>ZÁVODŮ</em></div><div class="pg-sub">Zadej skutečné výsledky → automatický výpočet bodů</div></div>
+    <div><div class="pg-title">ADMIN — <em>VÝSLEDKY</em></div></div>
   </div>
-  <div class="legend-box">
-    <div class="legend-ttl">Bodování</div>
-    <div class="legend-items">
-      <div class="li"><span class="lpts">10</span> Správná pozice TOP5</div>
-      <div class="li"><span class="lpts">4</span> Jezdec v TOP5 (špatná pozice)</div>
-      <div class="li"><span class="lpts">8</span> Pole Position</div>
-      <div class="li"><span class="lpts">6</span> Fastest Lap</div>
-      <div class="li"><span class="lpts">6</span> DNF přesně / <span class="lpts">3</span> ±1</div>
-      <div class="li"><span class="lpts">3</span> Safety Car</div>
-      <div class="li"><span class="lpts">5</span> Nejlepší tým</div>
-      <div class="li"><span class="lpts">10</span> Bonus (3+ jezdců)</div>
-      <div class="li" style="color:var(--purple)">Sprint = vše ÷ 2</div>
+  <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px">Vyber závod</div>
+  <div id="admin-race-selector" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px"></div>
+  <div id="admin-result-form" style="display:none;background:var(--bg2);border:1px solid rgba(255,171,64,.3);border-radius:12px;overflow:hidden;margin-bottom:20px">
+    <div style="background:rgba(255,171,64,.08);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--amber);letter-spacing:2px" id="admin-race-title">ZÁVOD</div>
     </div>
-  </div>
-  <div class="res-grid" id="result-race-grid"></div>
-  <div class="res-form" id="result-form">
-    <div class="res-form-hd">
-      <div><div class="res-form-ttl" id="result-race-title"></div><div style="color:var(--muted2);font-size:13px;margin-top:2px" id="result-race-date"></div></div>
-      <span id="result-sprint-badge" class="sprint-badge" style="display:none">◈ SPRINT</span>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <button class="btn-ghost" id="btn-load-api" onclick="loadF1Results()" style="border-color:rgba(255,171,64,.4);color:var(--amber)">⬇ Načíst z F1 API</button>
-        <button class="btn-ghost" onclick="hideResultForm()">← Zpět</button>
+    <div style="padding:20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px" id="admin-p1-10"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--muted2);text-transform:uppercase">Fastest Lap</label>
+          <select class="fsel" id="adm-fl"></select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--muted2);text-transform:uppercase">Driver of Day</label>
+          <select class="fsel" id="adm-dod"></select>
+        </div>
       </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn-red" onclick="saveAdminResults()">ULOŽIT VÝSLEDKY</button>
+        <button style="background:var(--amber);border:none;color:#000;padding:11px 24px;border-radius:8px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px" onclick="calcFantasyPoints()">VYPOČÍTAT BODY</button>
+      </div>
+      <div id="admin-status" style="margin-top:10px;font-size:13px;color:var(--muted2)"></div>
     </div>
-    <div class="res-form-bd">
-      <div class="sec-tag amber">Skutečné top 5</div>
-      <div class="t5grid" id="result-top5"></div>
-      <div class="divider"></div>
-      <div class="extras">
-        <div class="fgrp"><label class="flbl">Pole Position</label><div class="driver-picker amber" id="r-pole-picker" data-field="r-pole"></div><input type="hidden" id="r-pole"></div>
-        <div class="fgrp"><label class="flbl">Fastest Lap</label><div class="driver-picker amber" id="r-fl-picker" data-field="r-fl"></div><input type="hidden" id="r-fl"></div>
-        <div class="fgrp"><label class="flbl">Nejlepší tým</label><div class="team-picker amber" id="r-team-picker" data-field="r-team"></div><input type="hidden" id="r-team"></div>
-      </div>
-      <div class="divider"></div>
-      <div class="extras">
-        <div class="fgrp"><label class="flbl">Počet DNF</label><input type="number" class="finput" id="r-dnf" min="0" max="20" value="0" style="width:80px;border-color:rgba(255,171,64,.2)"></div>
-        <div class="fgrp"><label class="flbl">Safety Car?</label><div class="sc-row"><button class="toggle" id="r-sc-yes" onclick="toggleRSC('ANO')">ANO</button><button class="toggle" id="r-sc-no" onclick="toggleRSC('NE')">NE</button></div></div>
-      </div>
-      <div class="form-acts">
-        <span id="result-save-status" class="save-status"></span>
-        <button class="btn-ghost" onclick="clearResultForm()">Vymazat</button>
-        <button style="background:var(--amber);border:none;color:#000;padding:11px 28px;border-radius:8px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;transition:all .2s" id="result-save-btn" onclick="saveResult()">ULOŽIT VÝSLEDKY</button>
-      </div>
-    </div>
-  </div>
-  <div class="scores-card" id="scores-card">
-    <div class="scores-hd"><div class="scores-ttl" id="scores-title"></div></div>
-    <table class="sctbl"><thead><tr><th>Hráč</th><th>TOP5</th><th>Pole</th><th>FL</th><th>DNF</th><th>SC</th><th>Tým</th><th>Bonus</th><th>Celkem</th></tr></thead><tbody id="scores-tbody"></tbody></table>
   </div>
 </div>
 
@@ -2287,6 +2251,352 @@ function mapTeamName(apiTeam) {
   }
   return apiTeam;
 }
+
+// ═══ FANTASY CONFIG ═══
+const BUDGET = 100.0;
+const ADMINS_F = ['Vláďa'];
+
+const DRIVER_PRICES = {
+  'Max Verstappen':30,'Lando Norris':28.5,'Charles Leclerc':27,'Oscar Piastri':25.5,
+  'George Russell':23,'Lewis Hamilton':22.5,'Fernando Alonso':18.5,'Carlos Sainz':17.5,
+  'Kimi Antonelli':16,'Lance Stroll':12,'Pierre Gasly':11.5,'Nico Hulkenberg':11,
+  'Esteban Ocon':10.5,'Oliver Bearman':10,'Isack Hadjar':9.5,'Liam Lawson':9,
+  'Franco Colapinto':8.5,'Gabriel Bortoleto':8,'Arvid Lindblad':7.5,'Alexander Albon':7,
+  'Sergio Perez':6.5,'Valtteri Bottas':6
+};
+const CONSTRUCTOR_PRICES = {
+  'McLaren':30,'Ferrari':28,'Red Bull Racing':25,'Mercedes':23,'Aston Martin':15,
+  'Alpine':12,'Williams':10,'Racing Bulls':9,'Haas':8,'Audi':7,'Cadillac':6
+};
+const DRIVER_TEAM_F = {
+  'Max Verstappen':'Red Bull Racing','Isack Hadjar':'Red Bull Racing',
+  'Lando Norris':'McLaren','Oscar Piastri':'McLaren',
+  'Charles Leclerc':'Ferrari','Lewis Hamilton':'Ferrari',
+  'George Russell':'Mercedes','Kimi Antonelli':'Mercedes',
+  'Fernando Alonso':'Aston Martin','Lance Stroll':'Aston Martin',
+  'Pierre Gasly':'Alpine','Franco Colapinto':'Alpine',
+  'Esteban Ocon':'Haas','Oliver Bearman':'Haas',
+  'Liam Lawson':'Racing Bulls','Arvid Lindblad':'Racing Bulls',
+  'Nico Hulkenberg':'Audi','Gabriel Bortoleto':'Audi',
+  'Carlos Sainz':'Williams','Alexander Albon':'Williams',
+  'Sergio Perez':'Cadillac','Valtteri Bottas':'Cadillac'
+};
+const CONSTRUCTORS = ['McLaren','Ferrari','Red Bull Racing','Mercedes','Aston Martin',
+  'Alpine','Williams','Racing Bulls','Haas','Audi','Cadillac'];
+
+let myTeam = { drivers:[], constructors:[], drsBoost:'' };
+let driverPrices = Object.assign({}, DRIVER_PRICES);
+let constructorPrices = Object.assign({}, CONSTRUCTOR_PRICES);
+let adminRaceId = null;
+
+// ═══ FANTASY INIT ═══
+async function fantasyInit() {
+  // Nacti ceny
+  try {
+    const d = await gGet('getDriverPrices');
+    if (d.drivers) driverPrices = d.drivers;
+    if (d.constructors) constructorPrices = d.constructors;
+  } catch(e) {}
+  // Nacti muj tym
+  try {
+    const d = await gGet('getMyTeam', { player: currentPlayer });
+    if (d.team) myTeam = d.team;
+  } catch(e) {}
+  loadFantasyStandings();
+}
+
+// ═══ NAVIGATION OVERRIDE ═══
+function showView(v, e) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  const viewEl = document.getElementById('view-' + v);
+  if (viewEl) viewEl.classList.add('active');
+  if (e && e.target) e.target.classList.add('active');
+  if (v === 'standings') loadFantasyStandings();
+  if (v === 'myteam') renderMyTeam();
+  if (v === 'allteams') loadAllTeams();
+  if (v === 'admin') renderAdminView();
+}
+
+// ═══ FANTASY STANDINGS ═══
+async function loadFantasyStandings() {
+  try {
+    const d = await gGet('getStandings');
+    if (d.standings) renderFantasyStandings(d.standings);
+  } catch(e) {}
+}
+
+function renderFantasyStandings(data) {
+  const sorted = data.slice().sort((a,b) => (b.total||0) - (a.total||0));
+  const leader = sorted[0]?.total || 0;
+  document.getElementById('standings-body').innerHTML = sorted.map((p, i) => {
+    const pos = i+1;
+    const pts = p.total || 0;
+    const gap = leader - pts;
+    const medal = pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos;
+    const barHtml = pos<=3 ? `<div class="stand-row-${pos}-bar"></div>` : '';
+    const rowCls = pos<=3 ? `pos-row-${pos}` : '';
+    const gapHtml = pos===1
+      ? `<span class="gap-pill" style="color:var(--gold);border-color:rgba(245,196,0,.25)">LEADER</span>`
+      : `<span class="gap-pill ${gap<=5?'gap-close':''}">−${gap} b</span>`;
+    return `<div class="stand-row ${rowCls}">
+      ${barHtml}
+      <div class="pos-medal ${pos<=3?'m'+pos:'mN'}">${pos<=3?`<span style="font-size:22px">${medal}</span>`:`<span class="pos-medal-num">${pos}</span>`}</div>
+      <div class="plr-info"><div class="plr-name">${p.player||p.name||'?'}</div><div class="plr-sub">${gapHtml}</div></div>
+      <div class="pts-wrap"><div class="pts-big">${pts}</div><div class="pts-label">bodů</div></div>
+      <div class="rpills"><span class="rpill">Fantasy body</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ MŮJ TÝM ═══
+function renderMyTeam() {
+  renderBudget();
+  renderSelectedTeam();
+  renderDriversGrid();
+  renderConstructorsGrid();
+  renderDRSSection();
+}
+
+function renderBudget() {
+  const spent = myTeam.drivers.reduce((s,d)=>s+(driverPrices[d]||0),0)
+              + myTeam.constructors.reduce((s,c)=>s+(constructorPrices[c]||0),0);
+  const rem = BUDGET - spent;
+  const el = document.getElementById('budget-remaining');
+  if(el){el.textContent='$'+rem.toFixed(1)+'M';el.style.color=rem<0?'var(--red)':rem<10?'var(--amber)':'var(--green)';}
+  const fill = document.getElementById('budget-fill');
+  if(fill){fill.style.width=Math.min(spent/BUDGET*100,100)+'%';fill.style.background=rem<0?'var(--red)':rem<10?'var(--amber)':'var(--green)';}
+  const dc=document.getElementById('drivers-count');if(dc)dc.textContent=myTeam.drivers.length+'/5';
+  const cc=document.getElementById('constructors-count');if(cc)cc.textContent=myTeam.constructors.length+'/2';
+}
+
+function renderSelectedTeam() {
+  const el = document.getElementById('selected-team');
+  if(!el) return;
+  if(myTeam.drivers.length===0&&myTeam.constructors.length===0){
+    el.innerHTML='<div style="color:var(--muted);font-size:13px">Zatím žádní — vyber níže</div>';
+    return;
+  }
+  el.innerHTML = [
+    ...myTeam.drivers.map(d => {
+      const isDRS = myTeam.drsBoost===d;
+      return `<div style="display:flex;align-items:center;gap:6px;background:${isDRS?'rgba(245,196,0,.1)':'var(--bg3)'};border:1px solid ${isDRS?'rgba(245,196,0,.3)':'var(--line2)'};border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600">
+        ${isDRS?'⚡ ':''}${d.split(' ').pop()}
+        <span style="color:var(--muted);font-size:10px">$${(driverPrices[d]||0).toFixed(1)}</span>
+        <button onclick="removeDriver('${d}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0;margin-left:2px">✕</button>
+      </div>`;
+    }),
+    ...myTeam.constructors.map(c => `<div style="display:flex;align-items:center;gap:6px;background:rgba(232,0,45,.08);border:1px solid rgba(232,0,45,.2);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600">
+        ${c}<span style="color:var(--muted);font-size:10px">$${(constructorPrices[c]||0).toFixed(1)}</span>
+        <button onclick="removeConstructor('${c}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0;margin-left:2px">✕</button>
+      </div>`)
+  ].join('');
+}
+
+function renderDriversGrid() {
+  const grid = document.getElementById('drivers-grid');
+  if(!grid) return;
+  grid.innerHTML = DRIVERS.filter(d=>d!=='TBA').map(d => {
+    const sel = myTeam.drivers.includes(d);
+    const isDRS = myTeam.drsBoost===d;
+    const price = driverPrices[d]||0;
+    const team = DRIVER_TEAM_F[d]||'';
+    const info = DRIVER_INFO[d]||{};
+    return `<div onclick="toggleDriver('${d}')" style="background:${sel?'rgba(232,0,45,.06)':'var(--bg2)'};border:1px solid ${isDRS?'var(--gold)':sel?'var(--red)':'var(--line)'};border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px">
+      <img src="${info.img||''}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:top;background:var(--bg3);flex-shrink:0" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.split(' ').pop()}</div>
+        <div style="font-size:11px;color:var(--muted2)">${team}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:15px;font-weight:700">$${price.toFixed(1)}</div>
+        ${sel?'<div style="color:var(--red);font-size:10px;font-weight:700">✓ VYBRÁNO</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderConstructorsGrid() {
+  const grid = document.getElementById('constructors-grid');
+  if(!grid) return;
+  grid.innerHTML = CONSTRUCTORS.map(c => {
+    const sel = myTeam.constructors.includes(c);
+    const price = constructorPrices[c]||0;
+    const info = TEAM_INFO[c]||{};
+    return `<div onclick="toggleConstructor('${c}')" style="background:${sel?'rgba(232,0,45,.06)':'var(--bg2)'};border:1px solid ${sel?'var(--red)':'var(--line)'};border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px">
+      ${info.logo?`<img src="${info.logo}" style="width:36px;height:36px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">`:
+        `<div style="width:10px;height:36px;border-radius:3px;background:${info.color||'#555'};flex-shrink:0"></div>`}
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${c}</div>
+        <div style="font-size:11px;color:var(--muted2)">Konstruktér</div></div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:15px;font-weight:700">$${price.toFixed(1)}</div>
+        ${sel?'<div style="color:var(--red);font-size:10px;font-weight:700">✓</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDRSSection() {
+  const sec = document.getElementById('drs-section');
+  const grid = document.getElementById('drs-grid');
+  if(!sec||!grid) return;
+  sec.style.display = myTeam.drivers.length ? 'block' : 'none';
+  grid.innerHTML = myTeam.drivers.map(d => {
+    const active = myTeam.drsBoost===d;
+    return `<button onclick="setDRS('${d}')" style="padding:6px 12px;border-radius:20px;border:1px solid ${active?'var(--gold)':'var(--line)'};background:${active?'rgba(245,196,0,.15)':'transparent'};color:${active?'var(--gold)':'var(--muted2)'};cursor:pointer;font-size:12px;font-weight:500;font-family:'Inter',sans-serif">${active?'⚡ ':''}${d.split(' ').pop()}</button>`;
+  }).join('');
+}
+
+function toggleDriver(d) {
+  if(myTeam.drivers.includes(d)){
+    removeDriver(d); return;
+  }
+  if(myTeam.drivers.length>=5){toast('Max 5 jezdců','error');return;}
+  const spent = myTeam.drivers.reduce((s,x)=>s+(driverPrices[x]||0),0)+myTeam.constructors.reduce((s,x)=>s+(constructorPrices[x]||0),0)+(driverPrices[d]||0);
+  if(spent>BUDGET){toast('Překročen budget $100M!','error');return;}
+  myTeam.drivers.push(d);
+  renderMyTeam();
+}
+
+function toggleConstructor(c) {
+  if(myTeam.constructors.includes(c)){removeConstructor(c);return;}
+  if(myTeam.constructors.length>=2){toast('Max 2 konstruktéři','error');return;}
+  const spent = myTeam.drivers.reduce((s,x)=>s+(driverPrices[x]||0),0)+myTeam.constructors.reduce((s,x)=>s+(constructorPrices[x]||0),0)+(constructorPrices[c]||0);
+  if(spent>BUDGET){toast('Překročen budget $100M!','error');return;}
+  myTeam.constructors.push(c);
+  renderMyTeam();
+}
+
+function removeDriver(d){myTeam.drivers=myTeam.drivers.filter(x=>x!==d);if(myTeam.drsBoost===d)myTeam.drsBoost='';renderMyTeam();}
+function removeConstructor(c){myTeam.constructors=myTeam.constructors.filter(x=>x!==c);renderMyTeam();}
+function setDRS(d){myTeam.drsBoost=myTeam.drsBoost===d?'':d;renderMyTeam();}
+
+async function saveMyTeam() {
+  if(myTeam.drivers.length!==5){toast('Vyber 5 jezdců','error');return;}
+  if(myTeam.constructors.length!==2){toast('Vyber 2 konstruktéry','error');return;}
+  if(!myTeam.drsBoost){toast('Vyber DRS Boost jezdce','error');return;}
+  try {
+    const d = await gPost({action:'saveTeam',player:currentPlayer,team:myTeam});
+    if(d.success) toast('✓ Tým uložen! Budget: $'+d.budget.toFixed(1)+'M použito','success');
+    else toast(d.error||'Chyba','error');
+  } catch(e){toast('Chyba: '+e.message,'error');}
+}
+
+// ═══ VŠECHNY TÝMY ═══
+async function loadAllTeams() {
+  try {
+    const d = await gGet('getAllTeams');
+    renderAllTeams(d.teams||[]);
+  } catch(e){document.getElementById('all-teams-body').innerHTML='<p style="color:var(--muted);padding:20px">Chyba načítání</p>';}
+}
+
+function renderAllTeams(teams) {
+  const body = document.getElementById('all-teams-body');
+  if(!teams.length){body.innerHTML='<p style="color:var(--muted);padding:20px">Žádné týmy zatím</p>';return;}
+  body.innerHTML = teams.map(team => {
+    const spent = team.drivers.reduce((s,d)=>s+(driverPrices[d]||0),0)+team.constructors.reduce((s,c)=>s+(constructorPrices[c]||0),0);
+    return `<div style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px">${team.player}</div>
+        <div style="font-size:12px;color:var(--muted2)">$${spent.toFixed(1)}M / $100M</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        ${team.drivers.map(d=>`<span style="padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:${team.drsBoost===d?'rgba(245,196,0,.15)':'rgba(255,255,255,.06)'};border:1px solid ${team.drsBoost===d?'rgba(245,196,0,.3)':'var(--line)'};color:${team.drsBoost===d?'var(--gold)':'var(--text2)'}">
+          ${d.split(' ').pop()}${team.drsBoost===d?' ⚡':''} <span style="color:var(--muted);font-size:10px">$${(driverPrices[d]||0).toFixed(1)}</span>
+        </span>`).join('')}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${team.constructors.map(c=>`<span style="padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:rgba(232,0,45,.08);border:1px solid rgba(232,0,45,.2);color:var(--red)">
+          ${c} <span style="color:var(--muted);font-size:10px">$${(constructorPrices[c]||0).toFixed(1)}</span>
+        </span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ ADMIN ═══
+function renderAdminView() {
+  const sel = document.getElementById('admin-race-selector');
+  if(!sel) return;
+  sel.innerHTML = RACES.map(r =>
+    `<button onclick="selectAdminRace('${r.id}')" style="padding:6px 14px;border-radius:20px;border:1px solid ${adminRaceId===r.id?'rgba(232,0,45,.4)':'var(--line)'};background:${adminRaceId===r.id?'rgba(232,0,45,.1)':'transparent'};color:${adminRaceId===r.id?'var(--red)':'var(--muted2)'};cursor:pointer;font-size:12px;font-family:'Inter',sans-serif">${r.name} ${r.done?'✓':''}</button>`
+  ).join('');
+}
+
+function driverOpts(){return'<option value="">— vybrat —</option>'+DRIVERS.filter(d=>d!=='TBA').map(d=>`<option value="${d}">${d}</option>`).join('');}
+
+function selectAdminRace(id) {
+  adminRaceId = id;
+  const race = RACES.find(r=>r.id===id);
+  renderAdminView();
+  const form = document.getElementById('admin-result-form');
+  if(!form) return;
+  form.style.display = 'block';
+  document.getElementById('admin-race-title').textContent = (race?race.name:id).toUpperCase();
+  // P1-P10
+  const grid = document.getElementById('admin-p1-10');
+  if(grid) grid.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(p=>
+    `<div style="display:flex;flex-direction:column;gap:5px">
+      <label style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--muted2);text-transform:uppercase">P${p}</label>
+      <select class="fsel" id="adm-p${p}">${driverOpts()}</select>
+    </div>`).join('');
+  // FL, DOD
+  const fl=document.getElementById('adm-fl');if(fl)fl.innerHTML=driverOpts();
+  const dod=document.getElementById('adm-dod');if(dod)dod.innerHTML=driverOpts();
+}
+
+async function saveAdminResults() {
+  if(!adminRaceId){toast('Vyber závod','error');return;}
+  const data={action:'saveRaceResult',player:currentPlayer,raceId:adminRaceId,type:'race',
+    p1:document.getElementById('adm-p1')?.value||'',
+    p2:document.getElementById('adm-p2')?.value||'',
+    p3:document.getElementById('adm-p3')?.value||'',
+    p4:document.getElementById('adm-p4')?.value||'',
+    p5:document.getElementById('adm-p5')?.value||'',
+    p6:document.getElementById('adm-p6')?.value||'',
+    p7:document.getElementById('adm-p7')?.value||'',
+    p8:document.getElementById('adm-p8')?.value||'',
+    p9:document.getElementById('adm-p9')?.value||'',
+    p10:document.getElementById('adm-p10')?.value||'',
+    fastestLap:document.getElementById('adm-fl')?.value||'',
+    driverOfDay:document.getElementById('adm-dod')?.value||''
+  };
+  try{
+    document.getElementById('admin-status').textContent='⏳ Ukládám...';
+    const d=await gPost(data);
+    if(d.success){document.getElementById('admin-status').textContent='✓ Výsledky uloženy!';toast('✓ Uloženo','success');}
+    else{document.getElementById('admin-status').textContent='✗ '+(d.error||'Chyba');toast(d.error||'Chyba','error');}
+  }catch(e){document.getElementById('admin-status').textContent='✗ '+e.message;toast('Chyba','error');}
+}
+
+async function calcFantasyPoints() {
+  if(!adminRaceId){toast('Vyber závod','error');return;}
+  try{
+    document.getElementById('admin-status').textContent='⏳ Počítám body...';
+    const d=await gPost({action:'calcFantasyPoints',raceId:adminRaceId,player:currentPlayer});
+    if(d.success){
+      const sum=d.results.map(r=>r.player+': '+r.total+'b').join(', ');
+      document.getElementById('admin-status').textContent='✓ Body: '+sum;
+      toast('✓ Body vypočítány!','success');
+      loadFantasyStandings();
+    }else{document.getElementById('admin-status').textContent='✗ '+(d.error||'Chyba');toast(d.error||'Chyba','error');}
+  }catch(e){document.getElementById('admin-status').textContent='✗ '+e.message;toast('Chyba','error');}
+}
+
+// ═══ OVERRIDE HIDEOVERLAY ═══
+const _origHideOverlay = hideOverlay;
+function hideOverlay() {
+  const ov=document.getElementById('lo-overlay');if(ov)ov.classList.add('gone');
+  const hdr=document.getElementById('app-header');if(hdr)hdr.style.display='';
+  const mn=document.getElementById('app-main');if(mn)mn.style.display='';
+  const badge=document.getElementById('user-badge');if(badge)badge.classList.add('show');
+  const av=document.getElementById('user-badge-avatar');if(av)av.textContent=(currentPlayer||'').slice(0,2).toUpperCase();
+  const nm=document.getElementById('user-badge-name');if(nm)nm.textContent=currentPlayer||'';
+  const isAdmin=ADMINS_F.includes(currentPlayer);
+  const adminBtn=document.getElementById('admin-btn');if(adminBtn)adminBtn.style.display=isAdmin?'':'none';
+  fantasyInit();
+}
+
 </script>
 </body>
 </html>
