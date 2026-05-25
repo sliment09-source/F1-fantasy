@@ -1071,6 +1071,7 @@ header {
   <div id="admin-result-form" style="display:none;background:var(--bg2);border:1px solid rgba(255,171,64,.3);border-radius:12px;overflow:hidden;margin-bottom:20px">
     <div style="background:rgba(255,171,64,.08);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--amber);letter-spacing:2px" id="admin-race-title">ZÁVOD</div>
+      <button id="btn-load-f1api" onclick="loadFantasyF1Results()" style="background:transparent;border:1px solid rgba(255,171,64,.4);color:var(--amber);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif">⬇ Načíst z F1 API</button>
     </div>
     <div style="padding:20px">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px" id="admin-p1-10"></div>
@@ -1084,6 +1085,10 @@ header {
           <select class="fsel" id="adm-dod"></select>
         </div>
       </div>
+      <!-- Positions gained -->
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin:16px 0 8px">Pozice gained / DNF (automaticky z API nebo zadej ručně)</div>
+      <div id="admin-pos-gained" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px"></div>
+
       <div style="display:flex;gap:10px;margin-top:16px">
         <button class="btn-red" onclick="saveAdminResults()">ULOŽIT VÝSLEDKY</button>
         <button style="background:var(--amber);border:none;color:#000;padding:11px 24px;border-radius:8px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px" onclick="calcFantasyPoints()">VYPOČÍTAT BODY</button>
@@ -2555,6 +2560,15 @@ function selectAdminRace(id) {
   if(!form) return;
   form.style.display = 'block';
   document.getElementById('admin-race-title').textContent = (race?race.name:id).toUpperCase();
+  // Positions gained grid
+  const pgGrid = document.getElementById('admin-pos-gained');
+  if(pgGrid) pgGrid.innerHTML = DRIVERS.filter(d=>d!=='TBA').map(d=>
+    `<div style="display:flex;flex-direction:column;gap:4px">
+      <label style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase">${d.split(' ').pop()}</label>
+      <input class="finput" id="pg-${d.replace(/ /g,'_')}" placeholder="+3 nebo DNF" style="padding:7px 10px;font-size:12px">
+    </div>`
+  ).join('');
+
   // P1-P10
   const grid = document.getElementById('admin-p1-10');
   if(grid) grid.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(p=>
@@ -2569,6 +2583,13 @@ function selectAdminRace(id) {
 
 async function saveAdminResults() {
   if(!adminRaceId){toast('Vyber závod','error');return;}
+  // Positions gained
+  const posGained = {};
+  DRIVERS.filter(d=>d!=='TBA').forEach(d => {
+    const el = document.getElementById('pg-'+d.replace(/ /g,'_'));
+    if(el && el.value.trim()) posGained[d] = el.value.trim();
+  });
+
   const data={action:'saveRaceResult',player:currentPlayer,raceId:adminRaceId,type:'race',
     p1:document.getElementById('adm-p1')?.value||'',
     p2:document.getElementById('adm-p2')?.value||'',
@@ -2581,7 +2602,8 @@ async function saveAdminResults() {
     p9:document.getElementById('adm-p9')?.value||'',
     p10:document.getElementById('adm-p10')?.value||'',
     fastestLap:document.getElementById('adm-fl')?.value||'',
-    driverOfDay:document.getElementById('adm-dod')?.value||''
+    driverOfDay:document.getElementById('adm-dod')?.value||'',
+    positionsGained: posGained
   };
   try{
     document.getElementById('admin-status').textContent='⏳ Ukládám...';
@@ -2862,6 +2884,189 @@ function handleMobileMyTeam(){
   else{tb.style.gridTemplateColumns='340px 1fr';tb.style.height='calc(100vh - 56px)';}
 }
 mq.addEventListener('change', handleMobileMyTeam);
+
+
+// ═══ FANTASY F1 API — načítání výsledků + pozice gained ═══
+const RACE_API_MAP_F = {
+  'australia':          { circuit: 'Melbourne',  year: 2026 },
+  'china-sprint':       { circuit: 'Shanghai',   year: 2026, sprint: true },
+  'china-gp':           { circuit: 'Shanghai',   year: 2026 },
+  'japan':              { circuit: 'Suzuka',     year: 2026 },
+  'miami-sprint':       { circuit: 'Miami',      year: 2026, sprint: true },
+  'miami-gp':           { circuit: 'Miami',      year: 2026 },
+  'canada-sprint':      { circuit: 'Montreal',   year: 2026, sprint: true },
+  'canada-gp':          { circuit: 'Montreal',   year: 2026 },
+  'monaco':             { circuit: 'Monaco',     year: 2026 },
+  'spain-barcelona':    { circuit: 'Barcelona',  year: 2026 },
+  'austria':            { circuit: 'Spielberg',  year: 2026 },
+  'great-britain-sprint':{ circuit: 'Silverstone', year: 2026, sprint: true },
+  'great-britain-gp':   { circuit: 'Silverstone', year: 2026 },
+  'belgium':            { circuit: 'Spa',        year: 2026 },
+  'hungary':            { circuit: 'Budapest',   year: 2026 },
+  'netherlands-sprint': { circuit: 'Zandvoort',  year: 2026, sprint: true },
+  'netherlands-gp':     { circuit: 'Zandvoort',  year: 2026 },
+  'italy':              { circuit: 'Monza',      year: 2026 },
+  'spain-madrid':       { circuit: 'Madrid',     year: 2026 },
+  'azerbaijan':         { circuit: 'Baku',       year: 2026 },
+  'singapore-sprint':   { circuit: 'Singapore',  year: 2026, sprint: true },
+  'singapore-gp':       { circuit: 'Singapore',  year: 2026 },
+  'usa-austin':         { circuit: 'Austin',     year: 2026 },
+  'mexico':             { circuit: 'Mexico City',year: 2026 },
+  'brazil':             { circuit: 'Sao Paulo',  year: 2026 },
+  'las-vegas':          { circuit: 'Las Vegas',  year: 2026 },
+  'qatar':              { circuit: 'Lusail',     year: 2026 },
+  'abu-dhabi':          { circuit: 'Yas Marina', year: 2026 },
+};
+
+async function loadFantasyF1Results() {
+  if(!adminRaceId){ toast('Nejdřív vyber závod','error'); return; }
+  const apiInfo = RACE_API_MAP_F[adminRaceId];
+  if(!apiInfo){ toast('Tento závod nemá API mapování','error'); return; }
+
+  const btn = document.getElementById('btn-load-f1api');
+  if(btn){ btn.textContent='⏳ Načítám...'; btn.disabled=true; }
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  try {
+    const isSprint = apiInfo.sprint;
+    const sessionName = isSprint ? 'Sprint' : 'Race';
+    toast('⏳ Načítám session...', 'info');
+
+    // 1. Session key
+    const sessions = await gGet('f1sessions', {
+      year: apiInfo.year,
+      circuit_short_name: apiInfo.circuit,
+      session_name: sessionName
+    });
+    if(!Array.isArray(sessions)||sessions.length===0){ toast('Data zatím nejsou dostupná','error'); return; }
+    const sessionKey = sessions[0].session_key;
+    await sleep(600);
+
+    // 2. Jezdci - mapování číslo -> jméno
+    const driversData = await gGet('f1drivers', { session_key: sessionKey });
+    const numToName = {};
+    if(Array.isArray(driversData)) {
+      driversData.forEach(d => {
+        const name = (d.first_name+' '+d.last_name).trim();
+        // Najdi shodu v DRIVERS poli
+        const matched = DRIVERS.find(dr => {
+          const parts = dr.split(' ');
+          return name.toUpperCase().includes(parts[parts.length-1].toUpperCase());
+        });
+        numToName[d.driver_number] = matched || name;
+      });
+    }
+    await sleep(600);
+
+    // 3. Výsledky závodu
+    toast('⏳ Načítám výsledky...', 'info');
+    const raceResults = await gGet('f1results', { session_key: sessionKey });
+    if(!Array.isArray(raceResults)||raceResults.length===0){ toast('Výsledky nejsou dostupné','error'); return; }
+
+    const finishers = raceResults.filter(r=>r.position!==null&&!r.dnf).sort((a,b)=>a.position-b.position);
+    const dnfs = raceResults.filter(r=>r.dnf);
+
+    // Nastav P1-P10
+    [1,2,3,4,5,6,7,8,9,10].forEach((p,i) => {
+      const el = document.getElementById('adm-p'+p);
+      if(el && finishers[i]) el.value = numToName[finishers[i].driver_number]||'';
+    });
+
+    // Vytvoř mapu: driver -> finish position
+    const finishPos = {};
+    finishers.forEach(r => { finishPos[numToName[r.driver_number]] = r.position; });
+    dnfs.forEach(r => { finishPos[numToName[r.driver_number]] = 'DNF'; });
+    await sleep(600);
+
+    // 4. Qualifying - startovní pozice
+    toast('⏳ Načítám kvalifikaci...', 'info');
+    const qualiName = isSprint ? 'Sprint Qualifying' : 'Qualifying';
+    const qualiSessions = await gGet('f1sessions', {
+      year: apiInfo.year,
+      circuit_short_name: apiInfo.circuit,
+      session_name: qualiName
+    });
+
+    if(Array.isArray(qualiSessions) && qualiSessions.length>0) {
+      await sleep(600);
+      const qualiKey = qualiSessions[0].session_key;
+      const qualiRes = await gGet('f1results', { session_key: qualiKey });
+
+      if(Array.isArray(qualiRes)) {
+        // Quali jezdci
+        const qualiDrivers = await gGet('f1drivers', { session_key: qualiKey });
+        const qualiNumToName = {};
+        if(Array.isArray(qualiDrivers)) {
+          qualiDrivers.forEach(d => {
+            const name = (d.first_name+' '+d.last_name).trim();
+            const matched = DRIVERS.find(dr => {
+              const parts = dr.split(' ');
+              return name.toUpperCase().includes(parts[parts.length-1].toUpperCase());
+            });
+            qualiNumToName[d.driver_number] = matched || name;
+          });
+        }
+
+        // Pole position
+        const pole = qualiRes.find(r=>r.position===1);
+        if(pole) {
+          const fl=document.getElementById('adm-fl');
+          // Pole position - zatim neni pole field, ale FL mame
+        }
+
+        // Vypocitej pozice gained pro kazdeho jezdce
+        qualiRes.forEach(qr => {
+          const driverName = qualiNumToName[qr.driver_number];
+          if(!driverName || !qr.position) return;
+          const startPos = qr.position;
+          const endResult = finishPos[driverName];
+          const pgEl = document.getElementById('pg-'+driverName.replace(/ /g,'_'));
+          if(!pgEl) return;
+          if(endResult === 'DNF') {
+            pgEl.value = 'DNF';
+          } else if(typeof endResult === 'number') {
+            const gained = startPos - endResult; // kladne = posunul se dopredu
+            pgEl.value = gained > 0 ? '+'+gained : String(gained);
+          }
+        });
+      }
+    }
+    await sleep(600);
+
+    // 5. FL z race_control
+    const rcData = await gGet('f1racecontrol', { session_key: sessionKey });
+    if(Array.isArray(rcData)) {
+      const flMsg = rcData.find(r =>
+        (r.category==='Other'&&r.message&&r.message.includes('FASTEST LAP'))||
+        (r.flag==='FASTEST LAP')
+      );
+      if(flMsg && flMsg.driver_number) {
+        const flName = numToName[flMsg.driver_number]||'';
+        const flEl = document.getElementById('adm-fl');
+        if(flEl && flName) flEl.value = flName;
+      }
+    }
+    if(!rcData || !rcData.length) {
+      // Zkus FL z laps
+      try {
+        await sleep(800);
+        const flData = await gGet('f1fastestlap', { session_key: sessionKey });
+        if(flData && flData.driver_number) {
+          const flEl = document.getElementById('adm-fl');
+          if(flEl) flEl.value = numToName[flData.driver_number]||'';
+        }
+      } catch(e) {}
+    }
+
+    toast('✓ Výsledky načteny! Zkontroluj a ulož.', 'success');
+  } catch(e) {
+    console.error('Fantasy F1 API error:', e);
+    toast('Chyba: '+e.message, 'error');
+  } finally {
+    if(btn){ btn.textContent='⬇ Načíst z F1 API'; btn.disabled=false; }
+  }
+}
 
 </script>
 </body>
