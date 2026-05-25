@@ -3034,30 +3034,16 @@ async function loadFantasyF1Results() {
     }
     await sleep(600);
 
-    // 5. FL z race_control
-    const rcData = await gGet('f1racecontrol', { session_key: sessionKey });
-    if(Array.isArray(rcData)) {
-      const flMsg = rcData.find(r =>
-        (r.category==='Other'&&r.message&&r.message.includes('FASTEST LAP'))||
-        (r.flag==='FASTEST LAP')
-      );
-      if(flMsg && flMsg.driver_number) {
-        const flName = numToName[flMsg.driver_number]||'';
+    // 5. FL z laps endpointu (nejspolehlivejsi)
+    try {
+      await sleep(600);
+      const flData = await gGet('f1fastestlap', { session_key: sessionKey });
+      if(flData && flData.driver_number) {
+        const flName = numToName[flData.driver_number]||'';
         const flEl = document.getElementById('adm-fl');
         if(flEl && flName) flEl.value = flName;
       }
-    }
-    if(!rcData || !rcData.length) {
-      // Zkus FL z laps
-      try {
-        await sleep(800);
-        const flData = await gGet('f1fastestlap', { session_key: sessionKey });
-        if(flData && flData.driver_number) {
-          const flEl = document.getElementById('adm-fl');
-          if(flEl) flEl.value = numToName[flData.driver_number]||'';
-        }
-      } catch(e) {}
-    }
+    } catch(e) { console.log('FL error:', e); }
 
     toast('✓ Výsledky načteny! Zkontroluj a ulož.', 'success');
   } catch(e) {
