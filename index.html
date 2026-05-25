@@ -49,7 +49,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .lo-load{display:none;justify-content:center;padding:12px}
 .lo-spin{width:22px;height:22px;border:2px solid rgba(255,255,255,0.1);border-top-color:#e8002d;border-radius:50%;animation:spin .7s linear infinite}
 .user-badge{display:none;align-items:center;gap:8px;background:rgba(232,0,45,0.1);border:1px solid rgba(232,0,45,0.25);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:600;color:#f0f0f0;margin-left:8px;cursor:pointer}
-.user-badge.show{display:flex}
 .user-badge-avatar{width:22px;height:22px;border-radius:50%;background:rgba(232,0,45,0.3);font-family:'Bebas Neue',sans-serif;font-size:11px;display:flex;align-items:center;justify-content:center}
 
 
@@ -59,7 +58,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
 <div id="lo-overlay">
   <div class="lo-box">
-    <div class="lo-logo"><div class="lo-badge">F1</div><div class="lo-ttl">TIPOVACKA 2026</div></div>
+    <div class="lo-logo"><div class="lo-badge">F1</div><div class="lo-ttl">FANTASY LIGA 2026</div></div>
     <div id="lo-s1">
       <div class="lo-h">VYBER SE</div>
       <div class="lo-sub">Klikni na sve jmeno</div>
@@ -281,9 +280,9 @@ function loInit() {
   grid.innerHTML = '';
   PLAYERS.forEach(name => {
     const btn = document.createElement('button');
-    btn.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#f0f0f0;padding:14px 20px;border-radius:12px;cursor:pointer;font-size:15px;font-weight:600;display:flex;align-items:center;gap:12px;width:100%;text-align:left;';
+    btn.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#f0f0f0;padding:14px 8px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;';
     const av = document.createElement('div');
-    av.style.cssText = 'width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:13px;display:flex;align-items:center;justify-content:center;color:#ccc;flex-shrink:0;font-family:"Bebas Neue",sans-serif;';
+    av.style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:14px;display:flex;align-items:center;justify-content:center;color:#ccc;font-family:"Bebas Neue",sans-serif;';
     av.textContent = name.slice(0,2).toUpperCase();
     btn.appendChild(av);
     btn.appendChild(document.createTextNode(name));
@@ -524,8 +523,7 @@ setInterval(() => {
 const FLAGS={australia:'🇦🇺',china:'🇨🇳',japan:'🇯🇵',miami:'🇺🇸',canada:'🇨🇦',monaco:'🇲🇨',spain:'🇪🇸',austria:'🇦🇹','great-britain':'🇬🇧',belgium:'🇧🇪',hungary:'🇭🇺',netherlands:'🇳🇱',italy:'🇮🇹',azerbaijan:'🇦🇿',singapore:'🇸🇬',usa:'🇺🇸',mexico:'🇲🇽',brazil:'🇧🇷','las-vegas':'🇺🇸',qatar:'🇶🇦','abu-dhabi':'🇦🇪'};
 function getFlag(id){for(const[k,v]of Object.entries(FLAGS)){if(id.startsWith(k))return v;}return'🏁';}
 const FB_STANDINGS=[{name:'Michal',CELKEM:225.5},{name:'Milan',CELKEM:224.5},{name:'Vláďa',CELKEM:218},{name:'Ondra',CELKEM:209.5},{name:'Markét',CELKEM:209}];
-const _f1el = document.getElementById('f1fantasy');
-let scriptUrl = (_f1el ? _f1el.getAttribute('data-url') : null) || 'https://script.google.com/macros/s/AKfycbw4rcuuITI2TC2YFsQDsMzJksC-cI3q-GT-VwZuRef3zFqcVm2sC7MjPkIZfsAVl886PA/exec';
+let scriptUrl = 'https://script.google.com/macros/s/AKfycbw4rcuuITI2TC2YFsQDsMzJksC-cI3q-GT-VwZuRef3zFqcVm2sC7MjPkIZfsAVl886PA/exec';
 let selRace=null,selPlayer=PLAYERS[0],scVal=null;
 let localTips=JSON.parse(localStorage.getItem('f1_tips_2026')||'[]');
 let sheetTips=[],activeFilter='all';
@@ -2017,30 +2015,41 @@ async function gPost(data) {
 }
 
 // ═══ LOGIN ═══
-function loInit() {
-  const grid = document.getElementById('lo-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  PLAYERS.forEach(name => {
-    const btn = document.createElement('button');
-    btn.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#f0f0f0;padding:14px 20px;border-radius:12px;cursor:pointer;font-size:15px;font-weight:600;display:flex;align-items:center;gap:12px;width:100%;text-align:left;';
-    const av = document.createElement('div');
-    av.style.cssText = 'width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:13px;display:flex;align-items:center;justify-content:center;color:#ccc;flex-shrink:0;font-family:"Bebas Neue",sans-serif;';
-    av.textContent = name.slice(0,2).toUpperCase();
-    btn.appendChild(av);
-    btn.appendChild(document.createTextNode(name));
-    btn.addEventListener('click', () => loPick(name, btn));
-    grid.appendChild(btn);
-  });
-}
 
+
+var loSel=null;
+var currentPlayer=null;
+
+function loInit(){
+  var urlP=new URLSearchParams(window.location.search);
+  var p=urlP.get('player')||'';
+  var found=false;
+  for(var i=0;i<PLAYERS.length;i++){if(PLAYERS[i]===p){found=true;break;}}
+  if(found){currentPlayer=p;hideOverlay();return;}
+  var grid=document.getElementById('lo-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  for(var i=0;i<PLAYERS.length;i++){
+    (function(name){
+      var btn=document.createElement('button');
+      btn.style.cssText='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#f0f0f0;padding:14px 8px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;';
+      var av=document.createElement('div');
+      av.style.cssText='width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:14px;display:flex;align-items:center;justify-content:center;color:#ccc;';
+      av.textContent=name.slice(0,2).toUpperCase();
+      btn.appendChild(av);
+      btn.appendChild(document.createTextNode(name));
+      btn.addEventListener('click',function(){loPick(name,btn);});
+      grid.appendChild(btn);
+    })(PLAYERS[i]);
+  }
+}
 
 function loPick(name,btn){
   var btns=document.getElementById('lo-grid').querySelectorAll('button');
   for(var i=0;i<btns.length;i++){btns[i].style.background='rgba(255,255,255,0.05)';btns[i].style.borderColor='rgba(255,255,255,0.15)';btns[i].style.color='#f0f0f0';}
   btn.style.background='rgba(232,0,45,0.15)';btn.style.borderColor='rgba(232,0,45,0.5)';btn.style.color='#fff';
   loSel=name;loE1('');loL1(true);
-  gPost({action:'checkPassword', player: name})
+  gGet('checkPassword',{player:name})
     .then(function(d){loL1(false);if(d&&d.error){loE1(d.error);return;}loStep2(name,d&&d.hasPassword);})
     .catch(function(e){loL1(false);loE1('Chyba: '+(e.message||e));});
 }
@@ -2063,21 +2072,44 @@ function loStep2(name,hasPw){
   }
 }
 
+function loBack(){
+  document.getElementById('lo-s1').style.display='block';
+  document.getElementById('lo-s2').style.display='none';
+  document.getElementById('lo-cr').style.display='none';
+  document.getElementById('lo-li').style.display='none';
+  loE2('');
+}
+
+function loCreate(){
+  var pw1=document.getElementById('lo-p1').value.trim();
+  var pw2=document.getElementById('lo-p2').value.trim();
+  if(!pw1){loE2('Zadej heslo.');return;}
+  if(pw1.length<4){loE2('Heslo min. 4 znaky.');return;}
+  if(pw1!==pw2){loE2('Hesla se neshoduji.');return;}
+  loL2(true);loB2(true);
+  gGet('createPassword',{player:loSel,password:pw1})
+    .then(function(d){loL2(false);loB2(false);if(d&&d.success)loSuccess(d.player);else loE2((d&&d.error)||'Chyba.');})
+    .catch(function(e){loL2(false);loB2(false);loE2('Chyba: '+(e.message||e));});
+}
+
+function loLogin(){
+  var pw=document.getElementById('lo-p').value.trim();
+  if(!pw){loE2('Zadej heslo.');return;}
+  loL2(true);loB2(true);
+  gGet('login',{player:loSel,password:pw})
+    .then(function(d){loL2(false);loB2(false);if(d&&d.success)loSuccess(d.player);else{loE2((d&&d.error)||'Spatne heslo.');document.getElementById('lo-p').value='';} })
+    .catch(function(e){loL2(false);loB2(false);loE2('Chyba: '+(e.message||e));});
+}
+
 function loSuccess(player){
-  currentPlayer=player;selPlayer=player;
-  var url=new URL(window.location.href);
-  url.searchParams.set('player',player);
-  window.history.replaceState({},'',url.toString());
+  currentPlayer=player;
   hideOverlay();
 }
 
 function loLogout(){
-  if(!confirm('Odhlasit se jako '+currentPlayer+'?'))return;
-  var url=new URL(window.location.href);
-  url.searchParams.delete('player');
-  window.location.href=url.toString();
+  if(!confirm('Odhlásit se jako '+currentPlayer+'?'))return;
+  location.reload();
 }
-
 function confirmLogout(){loLogout();}
 
 function hideOverlay(){
@@ -2085,29 +2117,22 @@ function hideOverlay(){
   var hdr=document.getElementById('app-header');if(hdr)hdr.style.display='';
   var mn=document.getElementById('app-main');if(mn)mn.style.display='';
   var badge=document.getElementById('user-badge');if(badge)badge.classList.add('show');
-  var av=document.getElementById('user-badge-avatar');if(av)av.textContent=(currentPlayer||'').slice(0,2).toUpperCase();
-  var nm=document.getElementById('user-badge-name');if(nm)nm.textContent=currentPlayer||'';
-  // Tlacitko Vysledky vidi vsichni, formular jen admin
-  var isAdmin = false;
-  for(var i=0;i<_AD.length;i++){if(_AD[i]===currentPlayer){isAdmin=true;break;}}
-  // Skryj/ukaz admin formular podle role
-  var resForm = document.getElementById('result-form');
-  if(resForm) resForm.setAttribute('data-admin', isAdmin ? '1' : '0');
-  // Nacti data po prihlaseni
-  loadStandings();
-  loadResults();
-  loadTips();
+  var av=document.getElementById('user-av');if(av)av.textContent=(currentPlayer||'').slice(0,2).toUpperCase();
+  var nm=document.getElementById('user-name');if(nm)nm.textContent=currentPlayer||'';
+  var isAdmin=ADMINS.includes(currentPlayer);
+  var adminBtn=document.getElementById('admin-btn');if(adminBtn)adminBtn.style.display=isAdmin?'':'none';
+  appInit();
 }
 
 function loL1(s){var e=document.getElementById('lo-l1');if(e)e.style.display=s?'flex':'none';}
-
-function loE1(m){var e=document.getElementById('lo-e1');if(e){e.textContent=m;e.style.display=m?'block':'none';}
-
+function loE1(m){var e=document.getElementById('lo-e1');if(e){e.textContent=m;e.style.display=m?'block':'none';}}
 function loL2(s){var e=document.getElementById('lo-l2');if(e)e.style.display=s?'flex':'none';}
-
-function loE2(m){var e=document.getElementById('lo-e2');if(e){e.textContent=m;e.style.display=m?'block':'none';}
-
+function loE2(m){var e=document.getElementById('lo-e2');if(e){e.textContent=m;e.style.display=m?'block':'none';}}
 function loB2(s){var b1=document.getElementById('lo-bcr');if(b1)b1.disabled=s;var b2=document.getElementById('lo-bli');if(b2)b2.disabled=s;}
+
+
+
+
 
 // ═══ NAVIGATION ═══
 function showView(v, e) {
