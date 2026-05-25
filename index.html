@@ -21,9 +21,9 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
 
 /* ═══ LOGIN ═══ */
-#lo-overlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;align-items:center;justify-content:center;padding:24px}
+#lo-overlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
 #lo-overlay.gone{display:none}
-.lo-box{width:100%;max-width:420px;background:#111114;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:36px 32px 32px;box-shadow:0 32px 80px rgba(0,0,0,0.8)}
+.lo-box{width:100%;max-width:420px;background:#111114;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:36px 32px 32px;box-shadow:0 32px 80px rgba(0,0,0,0.8);margin:auto}
 .lo-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
 .lo-badge{background:#e8002d;padding:8px 16px;clip-path:polygon(0 0,100% 0,88% 100%,0 100%);font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;line-height:1}
 .lo-ttl{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:4px;color:#888}
@@ -1621,7 +1621,7 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px}
 }
 
 /* ═══ TEAM BUILDER - SPLIT LAYOUT ═══ */
-.team-builder{display:grid;grid-template-columns:380px 1fr;gap:0;height:calc(100vh - 110px);min-height:600px;overflow:hidden}
+.team-builder{display:grid;grid-template-columns:380px 1fr;gap:0;min-height:600px;overflow:hidden}
 .tb-left{padding:14px;border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 .tb-right{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
 .tb-tabs{display:flex;border-bottom:1px solid var(--line);flex-shrink:0}
